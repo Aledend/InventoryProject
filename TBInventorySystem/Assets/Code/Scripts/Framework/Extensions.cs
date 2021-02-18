@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 public static class Extensions
 {
@@ -12,27 +11,27 @@ public static class Extensions
         return repeated;
     }
 
-    public static string ToCategoryString(this EItemCategory category)
+    public static string ToCategoryString(this CategoryName category)
     {
-        string name = System.Enum.GetName(typeof(EItemCategory), category);
+        string name = System.Enum.GetName(typeof(CategoryName), category);
         return string.IsNullOrEmpty(name) ? "Fetching." : name;
     }
 
-    //public static string ToCategoryPath(this EItemCategory category, InventorySystem.ItemManager m_ItemManager)
-    //{
-    //    Queue<string> builtString = new Queue<string>();
+    public static string ToCategoryPath(this CategoryName category, CategorySystem.CategoryAPI m_ItemManager)
+    {
+        Queue<string> builtString = new Queue<string>();
 
-    //    EItemCategory currentCategory = category;
+        CategoryName currentCategory = category;
 
-    //    builtString.Enqueue(ToCategoryString(currentCategory));
-        
-    //    while (m_ItemManager.FetchCategoryRef((int)currentCategory).ParentCategory != currentCategory);
-    //    {
-    //        currentCategory = m_ItemManager.FetchCategoryRef((int)currentCategory).ParentCategory;
+        builtString.Enqueue(ToCategoryString(currentCategory));
 
-    //        builtString.Enqueue(ToCategoryString(currentCategory));
-    //    }
+        while (m_ItemManager.FetchCategoryRef((int)currentCategory).ParentCategory != currentCategory) 
+        {
+            currentCategory = m_ItemManager.FetchCategoryRef((int)currentCategory).ParentCategory;
 
-    //    return string.Join("/", builtString.ToArray());
-    //}
+            builtString.Enqueue(ToCategoryString(currentCategory));
+        }
+
+        return string.Join("/", builtString.ToArray());
+    }
 }

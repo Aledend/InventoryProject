@@ -5,20 +5,20 @@ using System.IO;
 using UnityEngine.Assertions;
 using System.Collections.Generic;
 
-namespace InventorySystem
+namespace CategorySystem
 {
-    public class ItemManagerUtility
+    public class CategorySystemUtility
     {
-        public static void AddCategoryEnumToFile(string name, int index, ScriptableObject itemManager)
+        public static void AddCategoryEnumToFile(string name, int index, ScriptableObject categoryAPI)
         {
-            string enumPath = FetchEnumPath(itemManager);
+            string enumPath = FetchEnumPath(categoryAPI);
             int offset = 2;
 
             #region MakeSureFileExists
             if (!File.Exists(enumPath))
             {
                 StreamWriter fileCreate = File.CreateText(enumPath);
-                fileCreate.WriteLine("public enum EItemCategory" +
+                fileCreate.WriteLine("public enum ECategory" +
                     "{" +
                     "}");
                 fileCreate.Close();
@@ -51,16 +51,16 @@ namespace InventorySystem
             fileWrite.Close();
         }
 
-        public static void RemoveCategoryEnumFromFile(int index, ScriptableObject itemManager)
+        public static void RemoveCategoryEnumFromFile(int index, ScriptableObject categoryAPI)
         {
-            string enumPath = FetchEnumPath(itemManager);
+            string enumPath = FetchEnumPath(categoryAPI);
             int offset = 2;
 
             #region MakeSureFileExists
             if (!File.Exists(enumPath))
             {
                 StreamWriter fileCreate = File.CreateText(enumPath);
-                fileCreate.WriteLine("public enum EItemCategory" +
+                fileCreate.WriteLine("public enum ECategory" +
                     "{" +
                     "}");
                 fileCreate.Close();
@@ -79,17 +79,16 @@ namespace InventorySystem
             fileWrite.Close();
         }
 
-        public static string FetchEnumPath(ScriptableObject itemManager)
+        public static string FetchEnumPath(ScriptableObject categoryAPI)
         {
             string dataPath = Application.dataPath.Substring(0, Application.dataPath.Length - 6);
-            string assetPath = AssetDatabase.GetAssetPath(itemManager);
+            string assetPath = AssetDatabase.GetAssetPath(categoryAPI);
 
             List<string> assetPathParts = new List<string>(assetPath.Split('/'));
             assetPathParts.RemoveAt(assetPathParts.Count - 1);
             assetPath = string.Join("/", assetPathParts.ToArray());
 
-
-            return dataPath + assetPath + "/Data/ItemCategoryEnum.cs";
+            return dataPath + assetPath + "/Data/CategoryName.cs";
         }
     }
 }

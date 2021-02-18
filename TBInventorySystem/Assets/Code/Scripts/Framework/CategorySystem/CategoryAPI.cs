@@ -1,31 +1,31 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif // UNITY_EDITOR
 
-namespace InventorySystem
+namespace CategorySystem
 {
+
     [System.Serializable]
-    public struct ItemCategory
+    public struct CategoryData
     {
-        public EItemCategory Category;
-        public EItemCategory ParentCategory;
+        public CategoryName Category;
+        [HideInInspector] public CategoryName ParentCategory;
 
-        [SerializeField] private string m_RefreshCategory;
-        [SerializeField] private string m_RefreshParent;
+        [SerializeField] [HideInInspector] private string m_RefreshCategory;
+        [SerializeField] [HideInInspector] private string m_RefreshParent;
 
-        public ItemCategory(string category, EItemCategory parentCategory)
+        public CategoryData(string category, CategoryName parentCategory)
         {
             Category = 0;
             ParentCategory = parentCategory;
 
             m_RefreshCategory = category;
-            m_RefreshParent = System.Enum.GetName(typeof(EItemCategory), parentCategory);
+            m_RefreshParent = System.Enum.GetName(typeof(CategoryName), parentCategory);
         }
 
-        public ItemCategory(string category, string parentCategory)
+        public CategoryData(string category, string parentCategory)
         {
             Category = 0;
             ParentCategory = 0;
@@ -48,13 +48,13 @@ namespace InventorySystem
             return Category == ParentCategory;
         }
 
-        public int Level(ItemManager itemManager)
+        public int Level(CategoryAPI categoryAPI)
         {
-            EItemCategory currentCat = Category;
+            CategoryName currentCat = Category;
             int level = 0;
-            while(currentCat != itemManager.Categories[(int)currentCat].ParentCategory)
+            while (currentCat != categoryAPI.Categories[(int)currentCat].ParentCategory)
             {
-                currentCat = itemManager.Categories[(int)currentCat].ParentCategory;
+                currentCat = categoryAPI.Categories[(int)currentCat].ParentCategory;
                 level++;
             }
             return level;
@@ -66,76 +66,77 @@ namespace InventorySystem
         /// </summary>
         public void RefreshEnums()
         {
-            Category = (EItemCategory)System.Enum.Parse(typeof(EItemCategory), m_RefreshCategory, false);
-            ParentCategory = (EItemCategory)System.Enum.Parse(typeof(EItemCategory), m_RefreshParent, false);
+            Category = (CategoryName)System.Enum.Parse(typeof(CategoryName), m_RefreshCategory, false);
+            ParentCategory = (CategoryName)System.Enum.Parse(typeof(CategoryName), m_RefreshParent, false);
         }
     }
 
 
-    [CreateAssetMenu(fileName = "ItemManager", menuName = "ScriptableObjects/InventorySystem/ItemManager")]
-    public class ItemManager : ScriptableObject
+    [CreateAssetMenu(fileName = "CategoryData", menuName = "ScriptableObjects/CategorySystem/CategoryData")]
+    public class CategoryAPI : ScriptableObject
     {
-        //System.NonSerialized
-        [SerializeField] private ItemCategory[] m_Categories = new ItemCategory[] { };
+        [SerializeField] private CategoryData[] m_Categories = new CategoryData[] { };
+        public CategoryData[] Categories => m_Categories;
+
+        #region Editor
+#if UNITY_EDITOR
         [SerializeField] private bool[] m_Foldouts = new bool[] { };
         [SerializeField] private bool[] m_SearchedForFoldouts = new bool[] { };
-        [SerializeField] private string[] m_ItemWindowInputs = new string[] { "" };
-        
-        public ItemCategory[] Categories => m_Categories;
+        [SerializeField] private string[] m_EditorWindowInputs = new string[] { "" };
         public bool[] CategoryFoldouts => m_Foldouts;
         public bool[] SearchedForFoldouts => m_SearchedForFoldouts;
+        public string[] ItemWindowInputList => m_EditorWindowInputs;
         public bool IsFoldedOut(int index, bool searching)
         {
             return searching ? SearchedForFoldouts[index] : CategoryFoldouts[index];
         }
-
-        public string[] ItemWindowInputList => m_ItemWindowInputs;
+#endif // UNITY_EDITOR
+        #endregion // Editor
 
         private void OnEnable()
         {
+            #region Editor
 #if UNITY_EDITOR
             m_AsSerialized ??= new SerializedObject(this);
 #endif // UNITY_EDITOR
+            #endregion // Editor
         }
 
-        public ref ItemCategory FetchCategoryRef(int index)
+        public ref CategoryData FetchCategoryRef(int index)
         {
             return ref m_Categories[index];
         }
 
-        public ref ItemCategory FetchParentRef(int index)
-        {
-            return ref FetchCategoryRef((int)FetchCategoryRef(index).ParentCategory);
-        }
 
+        #region Editor
+#if UNITY_EDITOR
         public bool FetchFoldout(int index)
         {
             return m_Foldouts[index];
         }
-#if UNITY_EDITOR
         [SerializeField] [HideInInspector] private SerializedObject m_AsSerialized;
 
-        public void AddItemCategory(int insertAt, in ItemCategory inCategory)
+        public void AddItemCategory(int insertAt, in CategoryData inCategory)
         {
             if (insertAt == m_Categories.Length)
             {
                 m_AsSerialized.FindProperty(nameof(m_Categories)).arraySize += 1;
                 m_AsSerialized.FindProperty(nameof(m_Foldouts)).arraySize += 1;
                 m_AsSerialized.FindProperty(nameof(m_SearchedForFoldouts)).arraySize += 1;
-                m_AsSerialized.FindProperty(nameof(m_ItemWindowInputs)).arraySize += 1;
+                m_AsSerialized.FindProperty(nameof(m_EditorWindowInputs)).arraySize += 1;
             }
             else
             {
                 m_AsSerialized.FindProperty(nameof(m_Categories)).InsertArrayElementAtIndex(insertAt);
                 m_AsSerialized.FindProperty(nameof(m_Foldouts)).InsertArrayElementAtIndex(insertAt);
                 m_AsSerialized.FindProperty(nameof(m_SearchedForFoldouts)).InsertArrayElementAtIndex(insertAt);
-                m_AsSerialized.FindProperty(nameof(m_ItemWindowInputs)).InsertArrayElementAtIndex(insertAt+1);
+                m_AsSerialized.FindProperty(nameof(m_EditorWindowInputs)).InsertArrayElementAtIndex(insertAt + 1);
             }
             m_AsSerialized.ApplyModifiedProperties();
             m_Categories[insertAt] = inCategory;
             m_Foldouts[insertAt] = false;
             m_SearchedForFoldouts[insertAt] = false;
-            m_ItemWindowInputs[insertAt] = string.Empty;
+            m_EditorWindowInputs[insertAt] = string.Empty;
         }
 
         public void RemoveItemCategory(int removeAt)
@@ -143,9 +144,11 @@ namespace InventorySystem
             m_AsSerialized.FindProperty(nameof(m_Categories)).DeleteArrayElementAtIndex(removeAt);
             m_AsSerialized.FindProperty(nameof(m_Foldouts)).DeleteArrayElementAtIndex(removeAt);
             m_AsSerialized.FindProperty(nameof(m_SearchedForFoldouts)).DeleteArrayElementAtIndex(removeAt);
-            m_AsSerialized.FindProperty(nameof(m_ItemWindowInputs)).DeleteArrayElementAtIndex(removeAt+1);
+            m_AsSerialized.FindProperty(nameof(m_EditorWindowInputs)).DeleteArrayElementAtIndex(removeAt + 1);
             m_AsSerialized.ApplyModifiedProperties();
         }
 #endif // UNITY_EDITOR
+        #endregion // Editor
     }
+
 }

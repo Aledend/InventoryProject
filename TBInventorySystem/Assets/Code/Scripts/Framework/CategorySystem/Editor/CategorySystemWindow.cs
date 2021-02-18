@@ -1,10 +1,9 @@
 using UnityEditor;
 using UnityEngine;
-using System.Collections.Generic;
 
-namespace InventorySystem
+namespace CategorySystem
 {
-    public class ItemManagerWindow : EditorWindow
+    public class CategorySystemWindow : EditorWindow
     {
         #region LayoutProperties
         // Window
@@ -22,16 +21,16 @@ namespace InventorySystem
         #endregion
 
 
-        private SerializedObject m_AsSerialized = null;
-        [SerializeField] private SerializedObject AsSerialized => m_AsSerialized ??= new SerializedObject(this);
+        [SerializeField] private SerializedObject m_AsSerialized = null;
+        private SerializedObject AsSerialized => m_AsSerialized ??= new SerializedObject(this);
 
-        [SerializeField] private ItemManager m_ItemManager = null;
+        [SerializeField] private CategoryAPI m_ItemManager = null;
 
 
         [MenuItem("Window/ItemManager")]
         public static void ShowWindow()
         {
-            GetWindow(typeof(ItemManagerWindow));
+            GetWindow(typeof(CategorySystemWindow));
         }
 
         private void OnEnable()
@@ -85,7 +84,7 @@ namespace InventorySystem
             if(m_RefreshManually && GUILayout.Button("Refresh"))
             {
                 m_ForceBuffer = true;
-                UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
+                AssetDatabase.Refresh();
             }
 
             GUILayout.FlexibleSpace();
@@ -135,7 +134,7 @@ namespace InventorySystem
                     RecursiveDeletion(i);
                     if (!m_RefreshManually)
                     {
-                        UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
+                        AssetDatabase.Refresh();
                         m_BufferRefreshEnum = true;
                     }
                     GUILayout.EndHorizontal();
@@ -157,7 +156,7 @@ namespace InventorySystem
 
                 if ((m_ItemManager.IsFoldedOut(i, searching)))
                 {
-                    GUIAddCategoryInput(level+1, i+1, (EItemCategory)i);
+                    GUIAddCategoryInput(level+1, i+1, (CategoryName)i);
                 }
             }
 
@@ -166,7 +165,7 @@ namespace InventorySystem
             #endregion //GUIWindow
         }
 
-        private void GUIAddCategoryInput(int level, int enumIndex, EItemCategory parent)
+        private void GUIAddCategoryInput(int level, int enumIndex, CategoryName parent)
         {
             GUILayout.BeginHorizontal();
 
@@ -188,11 +187,11 @@ namespace InventorySystem
                     }
                     else
                     {
-                        name = System.Enum.GetName(typeof(EItemCategory), parent) 
+                        name = System.Enum.GetName(typeof(CategoryName), parent) 
                             + m_ItemManager.ItemWindowInputList[enumIndex];
                     }
 
-                    ItemManagerUtility.AddCategoryEnumToFile(
+                    CategorySystemUtility.AddCategoryEnumToFile(
                         name
                         , enumIndex
                         , m_ItemManager);
@@ -200,20 +199,20 @@ namespace InventorySystem
 
                     if (!m_RefreshManually)
                     {
-                        UnityEditor.Compilation.CompilationPipeline.RequestScriptCompilation();
+                        AssetDatabase.Refresh();
                         m_BufferRefreshEnum = true;
                     }
 
                     if (level == 0)
                     {
                         m_ItemManager.AddItemCategory(enumIndex
-                           , new ItemCategory(name
+                           , new CategoryData(name
                            , name));
                     }
                     else
                     {
                         m_ItemManager.AddItemCategory(enumIndex
-                           , new ItemCategory(name
+                           , new CategoryData(name
                            , parent));
                     }
                     
@@ -286,15 +285,15 @@ namespace InventorySystem
 
             for(int i = 0; i < amountToDelete; i++)
             {
-                ItemManagerUtility.RemoveCategoryEnumFromFile(index, m_ItemManager);
+                CategorySystemUtility.RemoveCategoryEnumFromFile(index, m_ItemManager);
                 m_ItemManager.RemoveItemCategory(index);
             }
         }
 
         private bool AllParentsFoldedOut(int index, bool searching)
         {
-            EItemCategory currentCategory = m_ItemManager.FetchCategoryRef(index).Category;
-            EItemCategory currentParent = m_ItemManager.FetchCategoryRef(index).ParentCategory;
+            CategoryName currentCategory = m_ItemManager.FetchCategoryRef(index).Category;
+            CategoryName currentParent = m_ItemManager.FetchCategoryRef(index).ParentCategory;
 
             while(currentParent != currentCategory)
             {

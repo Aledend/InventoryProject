@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f74771346c55f343b2701d0de78072c, type: 3}
+  m_Name: CategoryData
+  m_EditorClassIdentifier: 
+  m_Categories:
+  - Category: 0
+    ParentCategory: 0
+    m_RefreshCategory: Balls
+    m_RefreshParent: Balls
+  - Category: 1
+    ParentCategory: 0
+    m_RefreshCategory: BallsPurple
+    m_RefreshParent: Balls
+  - Category: 2
+    ParentCategory: 0
+    m_RefreshCategory: BallsGreen
+    m_RefreshParent: Balls
+  - Category: 3
+    ParentCategory: 3
+    m_RefreshCategory: Dynamic
+    m_RefreshParent: Dynamic
+  - Category: 4
+    ParentCategory: 4
+    m_RefreshCategory: Static
+    m_RefreshParent: Static
+  - Category: 5
+    ParentCategory: 4
+    m_RefreshCategory: StaticBarrel
+    m_RefreshParent: Static
+  m_Foldouts: 000000010000
+  m_SearchedForFoldouts: 000000000000
+  m_EditorWindowInputs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
