@@ -3,7 +3,15 @@ guid: 12fa016f950c5e44b837c81cd4204b43
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - m_BackgroundPrefab: {fileID: 5924526285357180306, guid: 01f3f5cb4845b224aa995e73f9b5d791, type: 3}
+  - m_SlotPrefab: {fileID: 4620710368727475917, guid: 8ae16198bc308d64fb0a9f52a5dfe44f, type: 3}
+  - m_CanvasPrefab: {fileID: 4309943135956062710, guid: f1fc2671df9154042815323911e037c7, type: 3}
+  - m_HeaderPrefab: {fileID: 6259655612960072228, guid: 2edef954cc81b6b45882d8431e59e53c, type: 3}
+  - m_SceneTarget: {instanceID: 0}
+  - m_InventoryCanvas: {instanceID: 0}
+  - m_SlotHoverSprite: {fileID: 21300000, guid: d0bdf9e90d6c2a6479d2bc26f8fe60e9, type: 3}
+  - m_SlotNormalSprite: {fileID: 21300000, guid: 9ea6432c6ad7f124b80246dee6b7f618, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

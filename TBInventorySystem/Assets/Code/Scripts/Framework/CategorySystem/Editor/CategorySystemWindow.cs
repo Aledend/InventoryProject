@@ -160,7 +160,6 @@ namespace CategorySystem
                 }
             }
 
-
             GUILayout.EndScrollView();
             #endregion //GUIWindow
         }

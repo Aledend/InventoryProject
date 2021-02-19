@@ -13,7 +13,6 @@ public class HeaderInteraction : MonoBehaviour, IPointerDownHandler, IPointerUpH
     private void Awake()
     {
         m_DragCoroutine = HandleDrag();
-        Assert.IsNotNull(m_TransformToDrag);
     }
 
     public void BindDragTarget(RectTransform parentToBind)
@@ -23,6 +22,7 @@ public class HeaderInteraction : MonoBehaviour, IPointerDownHandler, IPointerUpH
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        Assert.IsNotNull(m_TransformToDrag, "Drag parent was not set before used.");
         m_DragOffset = GetMousePos() - m_TransformToDrag.anchoredPosition;
         m_Dragging = true;
         StopCoroutine(m_DragCoroutine);

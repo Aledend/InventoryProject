@@ -19,3 +19,5 @@ MonoBehaviour:
   m_SceneTarget: {fileID: 0}
   m_SceneTargetName: InventoryUI
   m_InventoryCanvas: {fileID: 0}
+  m_SlotHoverSprite: {fileID: 21300000, guid: d0bdf9e90d6c2a6479d2bc26f8fe60e9, type: 3}
+  m_SlotNormalSprite: {fileID: 21300000, guid: 9ea6432c6ad7f124b80246dee6b7f618, type: 3}

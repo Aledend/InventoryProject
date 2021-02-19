@@ -1,18 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class SlotInteraction : MonoBehaviour
+namespace InventorySystem 
 {
-    // Start is called before the first frame update
-    void Start()
+    public class SlotInteraction : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
-        
-    }
+        [SerializeField] private Image m_TargetImage = null;
+        [SerializeField] private InventoryData m_InventoryData = null;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+
+        public void BindImage(in Image image)
+        {
+            m_TargetImage = image;
+            m_TargetImage.sprite = m_InventoryData.SlotNormalSprite;
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            m_TargetImage.sprite = m_InventoryData.SlotHoverSprite;
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            m_TargetImage.sprite = m_InventoryData.SlotNormalSprite;
+        }
     }
 }
