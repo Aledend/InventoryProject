@@ -10,16 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59179d15d491d454e8c49fd3e94846a7, type: 3}
-  m_Name: InventoryObject
+  m_Name: ThirdMediumBag
   m_EditorClassIdentifier: 
-  rows: 5
-  cols: 5
-  toggle: 98
-  slotWidth: 17.34
-  padding: 3
-  headerheight: 10
-  drawHeader: 1
-  m_InventoryData: {fileID: 11400000, guid: 7bc1d29162fb4724d943f529ff06ff45, type: 2}
+  TEST: 0
+  Rows: 7
+  Cols: 7
+  SlotWidth: 15
+  Padding: 3
+  Headerheight: 10
+  InventoryToggle: 0
   HideOnPlay: 0
+  DrawHeader: 1
+  UIDragTarget: {fileID: 0}
   UIParent: {fileID: 0}
   UIObject: {fileID: 0}
+  m_InventoryData: {fileID: 11400000, guid: 7bc1d29162fb4724d943f529ff06ff45, type: 2}

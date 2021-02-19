@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,50 +9,131 @@ namespace InventorySystem
     {
 
         private const float k_Spacing = 5f;
-        private const string k_AttachComponent = "Attach Component";
-        private const string k_CreateReferenceInScene = "Create Reference In Scene";
-        private bool m_Expanded = true;
         private float m_DropDownAngle = -90f;
         private float m_OptionsAngle = -90f;
         private const float k_DropdownWidth = 15f;
         private const float k_ButtonOffset = 330f;
-        private const float k_IndentOffset = 45f; // Simulate indent since EditorGUI.indentLevel wouldn't give in
         private bool m_ShowOptions = false;
         private bool m_HasHeader = false;
+        private const float k_HorizontalRuleHeight = 10f;
+        private const string k_IndentAsString = "     ";
+        private RectTransform m_GroupParent = null;
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Rect newPos = position;
+            
 
             Inventory inventory = property.objectReferenceValue as Inventory;
 
-            
-            
+            if (PropertyIsFirstInArray(property))
+            {
+                newPos.y += FetchButtonSize("").y + k_Spacing * 2f;
+                //Debug.Log("waa");
+                string arrayName = GetPropertyArrayName(property);
+                UnityEngine.Object target = property.serializedObject.targetObject;
+
+                System.Type type = target.GetType();
+                System.Reflection.FieldInfo field = type.GetField(arrayName);
+
+                System.Object value = field.GetValue(target);
+                Inventory[] arr = value as Inventory[];
+
+                Inventory first = Array.Find(arr, inv => inv != null);
+
+                for(int i = arr.Length-1; i >= 0; i--)
+                {
+                    if(ArrayUtility.IndexOf(arr, arr[i]) != ArrayUtility.LastIndexOf(arr, arr[i]))
+                    {
+                        if (arr[i] && property.serializedObject.targetObject)
+                        {
+                            Debug.LogWarning("Duplicates found in array. " +
+                                "Removed " + arr[i].name + " from " 
+                                + property.serializedObject.targetObject.name);
+                            arr[i] = null;
+                        }
+                    }
+                }
+                #region UIGroupButton
+                Rect genButtonRect = newPos;
+                genButtonRect.x = FetchLabelSize(k_IndentAsString + arrayName).x;
+                genButtonRect.y -= FetchLabelSize("Generate UIGroup").y * 1.5f;
+                genButtonRect.size = FetchButtonSize("Generate UIGroup");
+                #endregion
+                #region UIGroupLabel
+                Rect groupLabel = genButtonRect;
+                groupLabel.x += groupLabel.size.x + FetchLabelSize(k_IndentAsString).x;
+                groupLabel.size = FetchLabelSize("Group Target:");
+                groupLabel.width = position.width - genButtonRect.width < groupLabel.width ? 0f : groupLabel.width;
+                GUI.Label(groupLabel, "Group Target:");
+                #endregion
+                #region UIGroupObject
+                Rect groupParentRect = groupLabel;
+                groupParentRect.x += groupParentRect.size.x + FetchLabelSize(k_IndentAsString).x;
+                groupParentRect.width = Mathf.Clamp(groupParentRect.x +  300,
+                    0f, Mathf.Clamp(position.width - groupParentRect.x, 0, float.MaxValue));
+                m_GroupParent =  EditorGUI.ObjectField(groupParentRect, m_GroupParent, typeof(RectTransform), true) as RectTransform;
+                #endregion
+                GUI.enabled = m_GroupParent && first;
+                if(GUI.Button(genButtonRect, "Generate UIGroup") && first)
+                {
+                    first.GenerateUIGroup(arr, m_GroupParent);
+                }
+                GUI.enabled = true;
+                genButtonRect.x += genButtonRect.size.x;
+
+            }
+
+            EditorGUI.BeginChangeCheck();
+
             if (inventory)
             {
-                DrawDropDown(ref position, ref m_Expanded, ref m_DropDownAngle);
-                EditorGUI.indentLevel++;
+                property.isExpanded = DrawDropDown(ref newPos, property.isExpanded, ref m_DropDownAngle);
+            }
+
+            
+
+
+            string propertyLabel = property.displayName;
+            string propPath = property.propertyPath;
+            if(propPath.Contains("Array.data["))
+            {
+                propertyLabel = "Element " + propPath[propPath.Length - 2];
+                if(!inventory)
+                {
+                    propertyLabel = k_IndentAsString + propertyLabel;
+                }
+            }
+                
+
+            EditorGUI.PropertyField(newPos, property, new GUIContent(propertyLabel), true);
+
+            newPos.y += FetchObjectFieldSize("").y;
+            
+
+
+            if(!property.isExpanded || !inventory)
+            {
+                if (inventory)
+                {
+                    EditorGUI.indentLevel--;
+                }
+                EditorGUI.EndChangeCheck();
+                newPos.width = position.width + FetchLabelSize(k_IndentAsString).x;
+                newPos.x = position.x - FetchLabelSize(k_IndentAsString).x;
+                newPos.height = k_HorizontalRuleHeight;
+                EditorGUI.LabelField(newPos, "", GUI.skin.horizontalSlider);
+                return;
             }
 
 
-            EditorGUI.PropertyField(newPos, property, true);
-            newPos.y += FetchObjectFieldSize("").y;
-
-
-
             DrawSpace(ref newPos);
-
-
-            if (!m_Expanded || !inventory)
-                return;
-
-
 
             Rect buttonRect = newPos;
 
             #region AttachToUIButton
             GameObject selection = Selection.activeGameObject;
 
-            bool shouldDrawAttachButton = ShouldDrawAttachButton(out RectTransform rect);
+            bool shouldDrawAttachButton = ShouldDrawAttachButton(out RectTransform rect, inventory);
 
             {
                 string labelString;
@@ -150,7 +232,6 @@ namespace InventorySystem
 
                 if(GUI.Button(buttonRect, "Destroy"))
                 {
-                    
                     inventory.DestroyUI();
                 }
 
@@ -161,7 +242,7 @@ namespace InventorySystem
             #endregion // Generate/Regenerate Buttons
 
             #region Options
-            DrawDropDown(ref newPos, ref m_ShowOptions, ref m_OptionsAngle);
+            m_ShowOptions = DrawDropDown(ref newPos, m_ShowOptions, ref m_OptionsAngle);
             newPos.height = FetchLabelSize("").y;
             GUI.Label(EditorGUI.IndentedRect(newPos), "Options");
             newPos.y += newPos.height;
@@ -200,56 +281,84 @@ namespace InventorySystem
                 DrawSpace(ref newPos);
                 inventory.InventoryToggle = (KeyCode)EditorGUI.EnumPopup(newPos, "ToggleKey", inventory.InventoryToggle);
                 newPos.y += FetchEnumFieldSize("").y;
-                DrawSpace(ref newPos);
             }
             #endregion // Options
 
-            EditorGUI.indentLevel--;
+            EditorGUI.indentLevel-=2;
+
+
+            EditorGUI.EndChangeCheck();
+
+            newPos.width = position.width + FetchLabelSize(k_IndentAsString).x;
+            newPos.x = position.x - FetchLabelSize(k_IndentAsString).x;
+            EditorGUI.LabelField(newPos, "", GUI.skin.horizontalSlider);
+            DrawSpace(ref newPos);
 
         }
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            float height = EditorGUI.GetPropertyHeight(property, label, true);
-            if(m_Expanded && property.objectReferenceValue)
+            float height = EditorGUI.GetPropertyHeight(property, label, true) * 1.2f;
+
+            if(property.isExpanded && property.objectReferenceValue)
             {
-                height += GetBonusHeight();
+                height += GetBonusHeight(property);
             }
-            return height;
+
+            if (!property.isExpanded && PropertyIsFirstInArray(property))
+            {
+                height += FetchButtonSize("").y + k_Spacing * 2f;
+            }
+
+            return height + k_HorizontalRuleHeight;
         }
 
        
 
-        private float GetBonusHeight()
+        private float GetBonusHeight(SerializedProperty property)
         {
             float bonusHeight =
-                k_Spacing
-                + FetchObjectFieldSize("").y
-                + k_Spacing
-                + FetchButtonSize("").y // Generate/Regenerate button
-                + k_Spacing
+                +FetchObjectFieldSize("").y
+                + FetchButtonSize("").y
                 + FetchToggleSize("").y
-                + k_Spacing;
+                + k_Spacing * 4f;
 
             if(m_ShowOptions)
             {
                 bonusHeight += FetchLabelSize("").y * 5f + FetchEnumFieldSize("").y + FetchToggleSize("").y;
                 bonusHeight += k_Spacing * 8f;
+                if (m_HasHeader)
+                {
+                    bonusHeight += FetchLabelSize("").y * 2f;
+                }
             }
 
-            if(m_HasHeader)
+            if(PropertyIsFirstInArray(property))
             {
-                bonusHeight += FetchLabelSize("").y * 2f;
+                bonusHeight += k_Spacing * 2f + FetchButtonSize("").y;
             }
 
             return bonusHeight;
         }
 
-        private bool ShouldDrawAttachButton(out RectTransform rect)
+        private bool PropertyIsFirstInArray(SerializedProperty property)
+        {
+            return property.propertyPath.Contains("Array.data[")
+                && property.propertyPath[property.propertyPath.Length - 2] == '0';
+        }
+
+        private string GetPropertyArrayName(SerializedProperty property)
+        {
+            return property.propertyPath.Remove(property.propertyPath.Length - (".Array.data[".Length + 2));
+        }
+
+
+        private bool ShouldDrawAttachButton(out RectTransform rect, Inventory inventory)
         {
             rect = null;
 
             GameObject selection = Selection.activeGameObject;
             bool shouldDraw = (selection && selection.scene.IsValid()
+            && (!inventory.UIObject || (inventory.UIObject && !selection.transform.IsChildOf(inventory.UIObject.transform))) 
             && selection.TryGetComponent(out rect));
 
             return shouldDraw;
@@ -297,7 +406,7 @@ namespace InventorySystem
             return size;
         }
 
-        private void DrawDropDown(ref Rect position, ref bool value, ref float angle)
+        private bool DrawDropDown(ref Rect position, bool value, ref float angle)
         {
             Vector2 dropdownSize = new Vector2(k_DropdownWidth, FetchObjectFieldSize(string.Format("None ({0})", nameof(Inventory))).y);
             Rect newPos = EditorGUI.IndentedRect(position);
@@ -306,15 +415,17 @@ namespace InventorySystem
             Vector2 pos = new Vector2(newPos.x + newPos.width * 0.5f, newPos.y + newPos.height * 0.5f);
             angle = value ? 0 : -90;
             GUIUtility.RotateAroundPivot(angle, pos);
+
             if (EditorGUI.DropdownButton(newPos, EditorGUIUtility.IconContent("icon dropdown"),
                 FocusType.Keyboard, new GUIStyle(GUI.skin.label)))
             {
                 value = !value;
+                GUI.changed = true;
             }
             GUIUtility.RotateAroundPivot(-angle, pos);
 
-            position.x += dropdownSize.x;
-            position.width -= dropdownSize.x;
+            EditorGUI.indentLevel++; 
+            return value;
         }
 
         private void DrawSpace(ref Rect position)

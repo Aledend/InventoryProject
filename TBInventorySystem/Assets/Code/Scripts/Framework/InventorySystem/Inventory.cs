@@ -21,6 +21,7 @@ namespace InventorySystem
     [CreateAssetMenu(fileName = "InventoryObject", menuName = "ScriptableObjects/InventorySystem/InventoryObject")]
     public class Inventory : ScriptableObject
     {
+        public bool TEST = false;
         public int Rows = 5;
         public int Cols = 5;
 
@@ -38,7 +39,7 @@ namespace InventorySystem
         public GameObject UIObject = null;
         public InventoryData m_InventoryData;
 
-
+        
         //not used
         public ItemSlot[,] Grid;
 
@@ -97,10 +98,10 @@ namespace InventorySystem
 
         // Handles generating and destroying of UI
         #region InventoryUI
-        public void RegenerateUI()
+        public void RegenerateUI(in RectTransform parent = null)
         {
             DestroyUI();
-            GenerateUI();
+            GenerateUI(parent);
         }
 
         public void DestroyUI()
@@ -115,19 +116,65 @@ namespace InventorySystem
             }
         }
 
-        public void GenerateUI()
+        public void GenerateUIGroup(in Inventory[] inventories, in RectTransform parent)
         {
-            GameObject background = m_InventoryData.CreateBackground(
-                UIParent ? UIParent : m_InventoryData.InventoryCanvas.transform);
+            RectTransform groupParent = m_InventoryData.CreateInventoryGroup(parent).GetComponent<RectTransform>();
 
-            Vector2 innerSize = new Vector2(Cols, Rows) * SlotWidth
-                + new Vector2(Cols, Rows) * Padding;
-            Vector2 backgroundSize = innerSize + Vector2.one * Padding;
+            groupParent.offsetMin = Vector2.zero;
+            groupParent.offsetMax = Vector2.zero;
 
-            if (DrawHeader)
+            Debug.Log(groupParent.rect);
+            Debug.Log(groupParent.pivot);
+
+            Array.ForEach(inventories, inv => {
+                if (inv != null)
+                {
+                    inv.RegenerateUI(groupParent);
+                    RectTransform invTrans = inv.UIObject.GetComponent<RectTransform>();
+                    invTrans.anchorMax = new Vector2(1f, 0f);
+                    invTrans.anchorMin = new Vector2(1f, 0f);
+                }
+            });
+
+
+            float inventoryPadding = 15f;
+            Rect latestPosition = CalculateInitialPosition(inventoryPadding, in groupParent);
+            PositionUIElement(ref latestPosition);
+            float maxWidth = UIObject.GetComponent<RectTransform>().rect.width;
+
+            Debug.Log(maxWidth);
+
+            foreach (Inventory inv in inventories)
             {
-                backgroundSize += Vector2.up * Headerheight;
+                if (inv != this && inv != null)
+                {
+                    latestPosition = CalculatePosition(inventoryPadding, ref latestPosition,
+                        in groupParent, in inv, ref maxWidth);
+                    inv.PositionUIElement(ref latestPosition);
+                }
             }
+        }
+
+        public void GenerateUI(in RectTransform inParentGroup, ref Vector2 latestPosition)
+        {
+            GenerateUI(inParentGroup);
+        }
+
+        private void PositionUIElement(ref Rect latestPosition)
+        {
+            UIObject.GetComponent<RectTransform>().anchoredPosition = latestPosition.position;
+        }
+
+        public void GenerateUI(in RectTransform inParentGroup = null)
+        {
+            Transform parent = inParentGroup ? inParentGroup
+                : UIParent ? UIParent
+                : m_InventoryData.InventoryCanvas.transform;
+
+            GameObject background = m_InventoryData.CreateBackground(parent);
+
+            Vector2 innerSize = CalculateInnerSize();
+            Vector2 backgroundSize = CalculateObjectSize();
 
             background.GetComponent<RectTransform>().sizeDelta = backgroundSize;
             Image m_BackgroundImage = background.GetComponent<Image>();
@@ -143,6 +190,10 @@ namespace InventorySystem
 
                 header.GetComponent<RectTransform>().anchoredPosition = headerPosition;
                 header.GetComponent<RectTransform>().sizeDelta = headerSize;
+                if(inParentGroup)
+                {
+                    UIDragTarget = inParentGroup;
+                }
                 header.AddComponent<HeaderInteraction>().BindDragTarget(
                     UIDragTarget ? UIDragTarget : m_BackgroundImage.rectTransform);
             }
@@ -177,6 +228,52 @@ namespace InventorySystem
 
             UIObject = background;
             
+        }
+
+        public Rect CalculateInitialPosition(float padding, in RectTransform parent)
+        {
+            Rect r = new Rect();
+            Vector2 size = CalculateObjectSize();
+            r.position = new Vector2(-size.x * 0.5f, size.y * 0.5f)
+                + new Vector2(-padding, padding);
+            r.size = size;
+            return r;
+        }
+
+        public Rect CalculatePosition(float padding, ref Rect latestPosition,
+            in RectTransform parent, in Inventory inv, ref float maxWidth)
+        {
+            Vector2 size = inv.CalculateObjectSize();
+
+            if(parent.rect.height - (latestPosition.y + latestPosition.height * 0.5f) < size.y)
+            {
+                latestPosition.y = padding + size.y * 0.5f;
+                latestPosition.x = latestPosition.x + latestPosition.width * 0.5f
+                    - padding - maxWidth - size.x * 0.5f;
+                latestPosition.size = size;
+                maxWidth = size.x;
+            }
+            else
+            {
+                Debug.Log(latestPosition + "\n" + size);
+                latestPosition.y += padding + latestPosition.height * 0.5f + size.y * 0.5f;
+                latestPosition.x += latestPosition.width * 0.5f - size.x * 0.5f;
+                maxWidth = Mathf.Max(maxWidth, size.x);
+                latestPosition.size = size;
+            }
+            return latestPosition;
+        }
+
+        private Vector2 CalculateInnerSize()
+        {
+            return new Vector2(Cols, Rows) * SlotWidth
+                + new Vector2(Cols, Rows) * Padding;
+        }
+
+        private Vector2 CalculateObjectSize()
+        {
+            return CalculateInnerSize() + Vector2.one * Padding 
+                + Vector2.up * (DrawHeader ? Headerheight : 0f);
         }
         #endregion
 

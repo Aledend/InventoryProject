@@ -16,6 +16,7 @@ MonoBehaviour:
   m_SlotPrefab: {fileID: 4620710368727475917, guid: 8ae16198bc308d64fb0a9f52a5dfe44f, type: 3}
   m_CanvasPrefab: {fileID: 4309943135956062710, guid: f1fc2671df9154042815323911e037c7, type: 3}
   m_HeaderPrefab: {fileID: 6259655612960072228, guid: 2edef954cc81b6b45882d8431e59e53c, type: 3}
+  m_InventoryGroupPrefab: {fileID: 3900123899026151884, guid: 613b86f899a7a0446a974dc1ed18bbd1, type: 3}
   m_SceneTarget: {fileID: 0}
   m_SceneTargetName: InventoryUI
   m_InventoryCanvas: {fileID: 0}
