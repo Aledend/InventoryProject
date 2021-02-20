@@ -18,7 +18,7 @@ MonoBehaviour:
   SlotWidth: 15
   Padding: 3
   Headerheight: 10
-  InventoryToggle: 0
+  InventoryToggle: 98
   HideOnPlay: 0
   DrawHeader: 1
   UIDragTarget: {fileID: 0}

@@ -21,14 +21,13 @@ namespace InventorySystem
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Rect newPos = position;
-            
 
             Inventory inventory = property.objectReferenceValue as Inventory;
 
             if (PropertyIsFirstInArray(property))
             {
                 newPos.y += FetchButtonSize("").y + k_Spacing * 2f;
-                //Debug.Log("waa");
+
                 string arrayName = GetPropertyArrayName(property);
                 UnityEngine.Object target = property.serializedObject.targetObject;
 
@@ -161,10 +160,10 @@ namespace InventorySystem
                 buttonRect.x = k_ButtonOffset;
                 if (GUI.Button(buttonRect, "Attach To UI Element"))
                 {
-                    inventory.UIParent = rect;
+                    inventory.UIParent = rect.gameObject;
                     if (inventory.UIObject)
                     {
-                        inventory.UIObject.transform.SetParent(inventory.UIParent);
+                        inventory.UIObject.transform.SetParent(inventory.UIParent.transform);
                     }
                 }
                 newPos.y += size.y;
@@ -199,7 +198,6 @@ namespace InventorySystem
                 buttonRect.x = k_ButtonOffset;
                 if (GUI.Button(buttonRect, "Generate"))
                 {
-                    Debug.Log("Generating");
                     inventory.GenerateUI();
                 }
                 newPos.y += size.y;
@@ -270,9 +268,9 @@ namespace InventorySystem
                     newPos.y += FetchLabelSize("").y;
                     DrawSpace(ref newPos);
 
-                    inventory.UIDragTarget = EditorGUI.ObjectField(newPos, nameof(inventory.UIDragTarget) +
+                    inventory.UIDragTarget = (EditorGUI.ObjectField(newPos, nameof(inventory.UIDragTarget) +
                         (inventory.UIDragTarget ? string.Empty : " (Defaulted to self)"),
-                        inventory.UIDragTarget, typeof(RectTransform), true) as RectTransform;
+                        inventory.UIDragTarget, typeof(RectTransform), true) as RectTransform).gameObject;
                     newPos.y += newPos.height;
                     DrawSpace(ref newPos);
                 }

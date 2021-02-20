@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+#if UNITY_EDITOR
+using UnityEditor.Events;
+#endif
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace InventorySystem
 {
+    using Framework;
 
     [System.Serializable]
     public struct ItemSlot
@@ -15,13 +18,21 @@ namespace InventorySystem
 
     }
 
+    [Serializable]
+    public struct Serere
+    {
+        public RectTransform rect;
+    }
+
     /// <summary>
     /// Apply as a serialized variable inside a MonoBehavior to access.
     /// </summary>
     [CreateAssetMenu(fileName = "InventoryObject", menuName = "ScriptableObjects/InventorySystem/InventoryObject")]
-    public class Inventory : ScriptableObject
+    public class Inventory : ScriptableObject, ISerializationCallbackReceiver
     {
-        public bool TEST = false;
+
+        public Serere ser;
+
         public int Rows = 5;
         public int Cols = 5;
 
@@ -33,9 +44,9 @@ namespace InventorySystem
         public bool HideOnPlay = false;
         
         public bool DrawHeader = false;
-        public RectTransform UIDragTarget = null;
+        public GameObject UIDragTarget = null;
 
-        public RectTransform UIParent = null;
+        public GameObject UIParent = null;
         public GameObject UIObject = null;
         public InventoryData m_InventoryData;
 
@@ -44,7 +55,7 @@ namespace InventorySystem
         public ItemSlot[,] Grid;
 
         // Handles showing and hiding of UI
-        #region InputHandling
+#region InputHandling
         // Toggling function applied to the given input listener in OnBeforeSceneLoadRuntimeMethod
         private void ToggleActive()
         {
@@ -58,11 +69,16 @@ namespace InventorySystem
         private static readonly List<Inventory> s_InventoryInstances = new List<Inventory>();
         private void OnEnable()
         {
-            if(!s_InventoryInstances.Contains(this))
+#if UNITY_EDITOR
+            AssemblyReloadEvents.beforeAssemblyReload += OnBeforeSceneLoadRuntimeMethod;
+            AssemblyReloadEvents.afterAssemblyReload += OnBeforeSceneLoadRuntimeMethod;
+#endif
+            if (!s_InventoryInstances.Contains(this))
             {
                 s_InventoryInstances.Add(this);
             }
             Grid = new ItemSlot[Rows, Cols];
+
         }
 
 #if UNITY_EDITOR
@@ -71,7 +87,7 @@ namespace InventorySystem
             s_InventoryInstances.Remove(this);
         }
 #endif
-
+        
         // Called on scene load to imitate an "Awake" function.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoadRuntimeMethod()
@@ -84,7 +100,7 @@ namespace InventorySystem
                 {
                     SimpleInputListener sil = inputListener.AddComponent<SimpleInputListener>();
                     sil.Callback += inv.ToggleActive;
-                        sil.BoundKey = inv.InventoryToggle;
+                    sil.BoundKey = inv.InventoryToggle;
 
                     if (inv.HideOnPlay && inv.UIObject)
                     {
@@ -94,10 +110,10 @@ namespace InventorySystem
                 
             }
         }
-        #endregion // Input Handling
+#endregion // Input Handling
 
         // Handles generating and destroying of UI
-        #region InventoryUI
+#region InventoryUI
         public void RegenerateUI(in RectTransform parent = null)
         {
             DestroyUI();
@@ -123,9 +139,6 @@ namespace InventorySystem
             groupParent.offsetMin = Vector2.zero;
             groupParent.offsetMax = Vector2.zero;
 
-            Debug.Log(groupParent.rect);
-            Debug.Log(groupParent.pivot);
-
             Array.ForEach(inventories, inv => {
                 if (inv != null)
                 {
@@ -142,7 +155,6 @@ namespace InventorySystem
             PositionUIElement(ref latestPosition);
             float maxWidth = UIObject.GetComponent<RectTransform>().rect.width;
 
-            Debug.Log(maxWidth);
 
             foreach (Inventory inv in inventories)
             {
@@ -168,10 +180,36 @@ namespace InventorySystem
         public void GenerateUI(in RectTransform inParentGroup = null)
         {
             Transform parent = inParentGroup ? inParentGroup
-                : UIParent ? UIParent
+                : UIParent ? UIParent.GetComponent<RectTransform>()
                 : m_InventoryData.InventoryCanvas.transform;
 
+            SerializedObject obj = new SerializedObject(this);
+            
+
             GameObject background = m_InventoryData.CreateBackground(parent);
+
+
+#if UNITY_EDITOR
+            InventorySceneReference sceneRef = background.AddComponent<InventorySceneReference>();
+            UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIObject);
+            sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
+            if (inParentGroup)
+            {
+                Debug.Log(inParentGroup.name);
+                sceneRef = inParentGroup.gameObject.AddComponent<InventorySceneReference>();
+                UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIParent);
+                sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
+                sceneRef = inParentGroup.gameObject.AddComponent<InventorySceneReference>(); 
+                UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIDragTarget); 
+                sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
+            }
+            else
+            {
+                sceneRef = background.AddComponent<InventorySceneReference>();
+                UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIDragTarget);
+                sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
+            }
+#endif
 
             Vector2 innerSize = CalculateInnerSize();
             Vector2 backgroundSize = CalculateObjectSize();
@@ -192,10 +230,10 @@ namespace InventorySystem
                 header.GetComponent<RectTransform>().sizeDelta = headerSize;
                 if(inParentGroup)
                 {
-                    UIDragTarget = inParentGroup;
+                    UIDragTarget = inParentGroup.gameObject;
                 }
                 header.AddComponent<HeaderInteraction>().BindDragTarget(
-                    UIDragTarget ? UIDragTarget : m_BackgroundImage.rectTransform);
+                    UIDragTarget ? UIDragTarget.GetComponent<RectTransform>() : m_BackgroundImage.rectTransform);
             }
 
 
@@ -227,11 +265,52 @@ namespace InventorySystem
             }
 
             UIObject = background;
+            UIParent = parent.gameObject; 
+        }
+
+        public void ReturnUIObject(GameObject uiObject)
+        {
+            ReturnObject(ref UIObject, uiObject);
+        }
+        public void ReturnUIParent(GameObject uiParent)
+        {
+            ReturnObject(ref UIParent, uiParent);
+        }
+        public void ReturnUIDragTarget(GameObject uiDragTarget)
+        {
+            ReturnObject(ref UIDragTarget, uiDragTarget);
+        } 
+
+        public void ReturnObject(ref GameObject go, GameObject inObject)
+        {
             
+            if(go == null)
+            {
+                go = inObject;
+            }
+            else if(go != inObject)
+            {
+                if (Application.isPlaying)
+                    Destroy(inObject);
+                else
+                    DestroyImmediate(inObject);
+            }
+        }
+
+        public void OnBeforeAssemblyReload()
+        {
+            Debug.Log("Before Assembly Reload");
+            Debug.Log(UIObject);
+        }
+
+        public void OnAfterAssemblyReload()
+        {
+            Debug.Log("Did I lose references because of assembly reload?");
+            Debug.Log(UIObject);
         }
 
         public Rect CalculateInitialPosition(float padding, in RectTransform parent)
-        {
+        { 
             Rect r = new Rect();
             Vector2 size = CalculateObjectSize();
             r.position = new Vector2(-size.x * 0.5f, size.y * 0.5f)
@@ -255,7 +334,6 @@ namespace InventorySystem
             }
             else
             {
-                Debug.Log(latestPosition + "\n" + size);
                 latestPosition.y += padding + latestPosition.height * 0.5f + size.y * 0.5f;
                 latestPosition.x += latestPosition.width * 0.5f - size.x * 0.5f;
                 maxWidth = Mathf.Max(maxWidth, size.x);
@@ -275,7 +353,27 @@ namespace InventorySystem
             return CalculateInnerSize() + Vector2.one * Padding 
                 + Vector2.up * (DrawHeader ? Headerheight : 0f);
         }
-        #endregion
+
+        public void OnBeforeSerialize()
+        {
+            //if (UIObject)
+            //{
+            //    UIObject.AddComponent<InventorySceneReference>().Set(
+            //        this, new SerializedObject(this).FindProperty(nameof(UIObject)));
+            //}
+        }
+
+        public void OnAfterDeserialize()
+        {
+            //EditorApplication.update += RemoveReferences;
+        } 
+
+        private void RemoveReferences()
+        {
+            //Debug.Log("Remove");
+            //EditorApplication.update -= RemoveReferences;
+        }
+#endregion
 
 
         //Serialize content?
