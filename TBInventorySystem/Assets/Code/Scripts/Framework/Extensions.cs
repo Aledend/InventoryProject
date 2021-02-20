@@ -11,13 +11,15 @@ public static class Extensions
         return repeated;
     }
 
+#if UNITY_EDITOR
+    
     public static string ToCategoryString(this CategoryName category)
     {
         string name = System.Enum.GetName(typeof(CategoryName), category);
         return string.IsNullOrEmpty(name) ? "Fetching." : name;
     }
 
-    public static string ToCategoryPath(this CategoryName category, CategorySystem.CategoryAPI m_ItemManager)
+    public static string ToCategoryPath(this CategoryName category, CategorySystem.Editor.CategoryAPI m_ItemManager)
     {
         Queue<string> builtString = new Queue<string>();
 
@@ -34,4 +36,5 @@ public static class Extensions
 
         return string.Join("/", builtString.ToArray());
     }
+#endif
 }

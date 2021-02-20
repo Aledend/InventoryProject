@@ -15,31 +15,61 @@ MonoBehaviour:
   m_Categories:
   - Category: 0
     ParentCategory: 0
-    m_RefreshCategory: Balls
-    m_RefreshParent: Balls
+    m_RefreshCategory: Food
+    m_RefreshParent: Food
   - Category: 1
     ParentCategory: 0
-    m_RefreshCategory: BallsPurple
-    m_RefreshParent: Balls
+    m_RefreshCategory: FoodFresh
+    m_RefreshParent: Food
   - Category: 2
-    ParentCategory: 0
-    m_RefreshCategory: BallsGreen
-    m_RefreshParent: Balls
+    ParentCategory: 1
+    m_RefreshCategory: FoodFreshApple
+    m_RefreshParent: FoodFresh
   - Category: 3
-    ParentCategory: 3
-    m_RefreshCategory: Dynamic
-    m_RefreshParent: Dynamic
+    ParentCategory: 1
+    m_RefreshCategory: FoodFreshSteak
+    m_RefreshParent: FoodFresh
   - Category: 4
-    ParentCategory: 4
-    m_RefreshCategory: Static
-    m_RefreshParent: Static
+    ParentCategory: 1
+    m_RefreshCategory: FoodFreshFish
+    m_RefreshParent: FoodFresh
   - Category: 5
-    ParentCategory: 4
-    m_RefreshCategory: StaticBarrel
-    m_RefreshParent: Static
-  m_Foldouts: 000000010000
-  m_SearchedForFoldouts: 000000000000
+    ParentCategory: 0
+    m_RefreshCategory: FoodExpired
+    m_RefreshParent: Food
+  - Category: 6
+    ParentCategory: 5
+    m_RefreshCategory: FoodExpiredSteak
+    m_RefreshParent: FoodExpired
+  - Category: 7
+    ParentCategory: 5
+    m_RefreshCategory: FoodExpiredFish
+    m_RefreshParent: FoodExpired
+  - Category: 8
+    ParentCategory: 8
+    m_RefreshCategory: Cube
+    m_RefreshParent: Cube
+  - Category: 9
+    ParentCategory: 8
+    m_RefreshCategory: CubeLegendary
+    m_RefreshParent: Cube
+  - Category: 10
+    ParentCategory: 8
+    m_RefreshCategory: CubeEpic
+    m_RefreshParent: Cube
+  - Category: 11
+    ParentCategory: 8
+    m_RefreshCategory: CubeUncommon
+    m_RefreshParent: Cube
+  m_Foldouts: 000000000000000000000000
+  m_SearchedForFoldouts: 000000000000000000000000
   m_EditorWindowInputs:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 

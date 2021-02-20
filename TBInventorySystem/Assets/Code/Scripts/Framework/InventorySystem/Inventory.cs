@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor.Events;
 #endif
@@ -10,29 +11,61 @@ using UnityEngine.UI;
 namespace InventorySystem
 {
     using Framework;
+    using UnityEngine.Assertions;
 
     [System.Serializable]
-    public struct ItemSlot
+    public struct InventoryItem
     {
-        Vector2 gridPos;
+        public ItemData Data;
+        public int Amount;
 
+        public InventoryItem(ItemData itemData, int amount)
+        {
+            Data = itemData;
+            Amount = amount;
+        }
+
+        /// <summary>
+        /// Adds amount of items to the stack. Returning any overflow of items.
+        /// </summary>
+        /// <param name="inAmount">Amount to be added.</param>
+        /// <returns>Overflow of items.</returns>
+        public int AddAmount(int inAmount)
+        {
+            int overflow = Mathf.Clamp(Data.StackSize - (Amount + inAmount), int.MinValue, 0);
+            Amount += inAmount - overflow;
+            return overflow;
+        }
+
+        public InventoryItem TakeAmount(int amount)
+        {
+            return new InventoryItem(Data, Mathf.Min(Amount, amount));
+        }
+
+        public void RemoveAmount(int inAmount)
+        {
+            Amount -= inAmount;
+            Amount = Mathf.Clamp(Amount, 0, int.MaxValue);
+        }
+
+        public int TakeAll(out ItemData item)
+        {
+            item = Data;
+            int returnAmount = Amount;
+
+            Data = null;
+            Amount = 0;
+            return returnAmount;
+        }
     }
 
-    [Serializable]
-    public struct Serere
-    {
-        public RectTransform rect;
-    }
 
     /// <summary>
     /// Apply as a serialized variable inside a MonoBehavior to access.
     /// </summary>
     [CreateAssetMenu(fileName = "InventoryObject", menuName = "ScriptableObjects/InventorySystem/InventoryObject")]
-    public class Inventory : ScriptableObject, ISerializationCallbackReceiver
+    public class Inventory : ScriptableObject
     {
-
-        public Serere ser;
-
         public int Rows = 5;
         public int Cols = 5;
 
@@ -50,9 +83,11 @@ namespace InventorySystem
         public GameObject UIObject = null;
         public InventoryData m_InventoryData;
 
-        
-        //not used
-        public ItemSlot[,] Grid;
+        public InventoryItem[] Items;
+        public SlotInteraction[] Slots;
+
+        public UnityEvent<Inventory, InventoryItem> OnShiftClickItemCallback = new UnityEvent<Inventory, InventoryItem>();
+        public UnityEvent<Inventory, InventoryItem> OnCtrlClickItemCallback = new UnityEvent<Inventory, InventoryItem>();
 
         // Handles showing and hiding of UI
 #region InputHandling
@@ -77,8 +112,16 @@ namespace InventorySystem
             {
                 s_InventoryInstances.Add(this);
             }
-            Grid = new ItemSlot[Rows, Cols];
 
+            if(Items == null || (Items != null && Items.Length == 0))
+            {
+                Items = new InventoryItem[Rows * Cols];
+            }
+
+            if(Application.isPlaying)
+            {
+                UpdateUISprites();
+            }
         }
 
 #if UNITY_EDITOR
@@ -87,8 +130,8 @@ namespace InventorySystem
             s_InventoryInstances.Remove(this);
         }
 #endif
-        
-        // Called on scene load to imitate an "Awake" function.
+
+        // Called on scene load to imitate an "Awake" function. Handles toggle input.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoadRuntimeMethod()
         {
@@ -110,14 +153,14 @@ namespace InventorySystem
                 
             }
         }
-#endregion // Input Handling
+#endregion // ToggleInput
 
         // Handles generating and destroying of UI
 #region InventoryUI
         public void RegenerateUI(in RectTransform parent = null)
         {
             DestroyUI();
-            GenerateUI(parent);
+            GenerateUI(parent, true);   
         }
 
         public void DestroyUI()
@@ -177,39 +220,45 @@ namespace InventorySystem
             UIObject.GetComponent<RectTransform>().anchoredPosition = latestPosition.position;
         }
 
-        public void GenerateUI(in RectTransform inParentGroup = null)
+        public void GenerateUI(in RectTransform inParentGroup = null, bool regenerating = false)
         {
             Transform parent = inParentGroup ? inParentGroup
                 : UIParent ? UIParent.GetComponent<RectTransform>()
                 : m_InventoryData.InventoryCanvas.transform;
 
-            SerializedObject obj = new SerializedObject(this);
-            
-
             GameObject background = m_InventoryData.CreateBackground(parent);
 
-
+            // Keep references to scene objects alive in Editor and Builds.
+#region Scene Object Reference handling
 #if UNITY_EDITOR
+            // UIObject
             InventorySceneReference sceneRef = background.AddComponent<InventorySceneReference>();
             UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIObject);
             sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
-            if (inParentGroup)
+
+            // UIParent
+            if (!regenerating)
             {
-                Debug.Log(inParentGroup.name);
-                sceneRef = inParentGroup.gameObject.AddComponent<InventorySceneReference>();
+                sceneRef = parent.gameObject.AddComponent<InventorySceneReference>();
                 UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIParent);
                 sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
+            }
+            if (inParentGroup)
+            {
+                // Drag target (Group Parent)
                 sceneRef = inParentGroup.gameObject.AddComponent<InventorySceneReference>(); 
                 UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIDragTarget); 
                 sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
             }
             else
             {
+                // Drag target (Self)
                 sceneRef = background.AddComponent<InventorySceneReference>();
                 UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIDragTarget);
                 sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
             }
 #endif
+#endregion // Reference Handling
 
             Vector2 innerSize = CalculateInnerSize();
             Vector2 backgroundSize = CalculateObjectSize();
@@ -248,35 +297,49 @@ namespace InventorySystem
 
                     Vector2 slotPosition;
 
-                    slotPosition.x = ((float)x / Cols) * innerSize.x;
-                    slotPosition.y = ((float)y / Rows) * innerSize.y;
+                    slotPosition.x = x * SlotWidth + x * Padding;
+                    slotPosition.y = -(y * SlotWidth + y * Padding);
 
-                    slotPosition -= innerSize * 0.5f;
-                    slotPosition += Vector2.one * SlotWidth * 0.5f;
-                    slotPosition += Vector2.one * Padding * 0.5f;
+                    slotPosition += new Vector2(-innerSize.x, innerSize.y) * 0.5f;
+                    slotPosition += new Vector2(SlotWidth, -SlotWidth) * 0.5f;
 
-                    if (DrawHeader)
+                   if (DrawHeader)
                         slotPosition -= Vector2.up * Headerheight * 0.5f;
 
                     slot.GetComponent<RectTransform>().anchoredPosition = slotPosition;
 
-                    slot.GetComponent<SlotInteraction>().BindImage(slot.GetComponent<Image>());
+                    SlotInteraction interaction = slot.GetComponentInChildren<SlotInteraction>();
+                    interaction.BindProperties(this);
+                    if(Items[y * Cols + x].Data != null)
+                    {
+                        interaction.SetSprite(Items[y * Cols + x]);
+                    }
                 }
             }
 
             UIObject = background;
-            UIParent = parent.gameObject; 
+            UIParent = parent.gameObject;
         }
 
-        public void ReturnUIObject(GameObject uiObject)
+        public void ReturnUIObject(InventorySceneReference sceneRef, GameObject uiObject)
         {
             ReturnObject(ref UIObject, uiObject);
         }
-        public void ReturnUIParent(GameObject uiParent)
+        public void ReturnUIParent(InventorySceneReference sceneRef, GameObject uiParent)
         {
-            ReturnObject(ref UIParent, uiParent);
+            if(UIParent == null)
+            {
+                UIParent = uiParent;
+            }
+            else if(UIParent != uiParent)
+            {
+                if (Application.isPlaying)
+                    Destroy(sceneRef);
+                else
+                    DestroyImmediate(sceneRef);
+            }
         }
-        public void ReturnUIDragTarget(GameObject uiDragTarget)
+        public void ReturnUIDragTarget(InventorySceneReference sceneRef, GameObject uiDragTarget)
         {
             ReturnObject(ref UIDragTarget, uiDragTarget);
         } 
@@ -287,7 +350,7 @@ namespace InventorySystem
             if(go == null)
             {
                 go = inObject;
-            }
+            } 
             else if(go != inObject)
             {
                 if (Application.isPlaying)
@@ -319,6 +382,15 @@ namespace InventorySystem
             return r;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="padding"></param>
+        /// <param name="latestPosition"></param>
+        /// <param name="parent"></param>
+        /// <param name="inv"></param>
+        /// <param name="maxWidth"></param>
+        /// <returns></returns>
         public Rect CalculatePosition(float padding, ref Rect latestPosition,
             in RectTransform parent, in Inventory inv, ref float maxWidth)
         {
@@ -345,41 +417,254 @@ namespace InventorySystem
         private Vector2 CalculateInnerSize()
         {
             return new Vector2(Cols, Rows) * SlotWidth
-                + new Vector2(Cols, Rows) * Padding;
+                + new Vector2(Cols-1, Rows-1) * Padding;
         }
 
         private Vector2 CalculateObjectSize()
         {
-            return CalculateInnerSize() + Vector2.one * Padding 
+            return CalculateInnerSize() + Vector2.one * Padding * 2f 
                 + Vector2.up * (DrawHeader ? Headerheight : 0f);
         }
 
-        public void OnBeforeSerialize()
+        /// <summary>
+        /// Attaches scene reference callback to new parent.
+        /// </summary>
+        /// <param name="parent">Parent in scene.</param>
+        public void SetUIParent(RectTransform parent)
         {
-            //if (UIObject)
-            //{
-            //    UIObject.AddComponent<InventorySceneReference>().Set(
-            //        this, new SerializedObject(this).FindProperty(nameof(UIObject)));
-            //}
+            UIParent = parent.gameObject;
+#if UNITY_EDITOR
+            InventorySceneReference sceneRef = parent.gameObject.AddComponent<InventorySceneReference>();
+            UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIParent);
+            sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
+#endif
+        }
+#endregion // Inventory UI
+
+        public InventoryItem FetchItem(int Row, int Col)
+        {
+            Assert.IsTrue(Row < Rows && Col < Cols,
+                string.Format("Array out of range. Row: {0}, Col: {1}", Row, Col));
+            return Items[Row * Cols + Col];
         }
 
-        public void OnAfterDeserialize()
+        public InventoryItem[] FetchInventory()
         {
-            //EditorApplication.update += RemoveReferences;
-        } 
-
-        private void RemoveReferences()
-        {
-            //Debug.Log("Remove");
-            //EditorApplication.update -= RemoveReferences;
+            return Items;
         }
-#endregion
 
+        public bool GetFirstEmptySlot(out int row, out int col)
+        {
+            for(int i = 0; i < Items.Length; i++)
+            {
+                if(Items[i].Data == null)
+                {
+                    col = i % Cols;
+                    row = (i - col) / Rows;
+                    return true;
+                }
+            }
+
+            row = -1;
+            col = -1;
+            return false;
+        }
+
+        public InventoryItem[] FetchInventoryGroup(Inventory[] inventories)
+        {
+            List<InventoryItem> items = new List<InventoryItem>();
+
+            foreach(Inventory inv in inventories)
+            {
+                if(inv != null)
+                {
+                    items.AddRange(inv.FetchInventory());
+                }
+            }
+
+            return items.ToArray();
+        }
+
+        public int ItemSlotToIndex(GameObject itemSlot)
+        {
+            Vector2 size = CalculateInnerSize();
+
+
+            Vector2 slotTopLeft = itemSlot.transform.parent.parent.GetComponent<RectTransform>().anchoredPosition + new Vector2(-SlotWidth, SlotWidth) * 0.5f;
+
+            Vector2 slotDelta = slotTopLeft + size * 0.5f;
+
+            int colIndex = Mathf.RoundToInt((slotDelta.x / size.x) * Cols);
+            int rowIndex = Mathf.RoundToInt((1-(slotDelta.y / size.y)) * Rows);
+
+            return rowIndex * Cols + colIndex;
+        }
+
+        public void SortInventory()
+        {
+            SlotInteraction[] slots = GetArrangedSlotArray();
+
+            MergeStacks(slots);
+            UpdateUISprites(slots);
+            IComparer<InventoryItem> comparer = new ItemComparerAndCompacter();
+            Array.Sort(Items, comparer);
+            UpdateUISprites();
+        }
+
+        private void MergeStacks(SlotInteraction[] slots = null)
+        {
+            slots ??= GetArrangedSlotArray();
+            for (int i = 0; i < Items.Length; i++)
+            {
+                if (!Items[i].Data || (Items[i].Amount == Items[i].Data.StackSize))
+                    continue;
+
+                for(int j = 0; j < Items.Length; j++)
+                {
+
+                    if (!Items[j].Data || Items[i].Data.Category.category != Items[j].Data.Category.category)
+                        continue;
+
+                    // Fill left as much as possible
+                    int space = Items[i].Data.StackSize - Items[i].Amount;
+                    int amountToMove = Mathf.Min(space, Items[j].Amount);
+                    Items[i].Amount += amountToMove;
+                    Items[j].Amount -= amountToMove;
+
+                    if(Items[j].Amount == 0 && Items[j].Data)
+                    {
+                        slots[j].RemoveSprite();
+                        Items[j].Data = null;
+                    }
+                }
+            }
+        }
+
+        public void ShiftClickItem(GameObject itemSlot)
+        {
+            InventoryItem item = Items[ItemSlotToIndex(itemSlot)];
+            OnShiftClickItemCallback.Invoke(this, item);
+        }
+
+        public void CtrlClickItem(GameObject itemSlot)
+        {
+            InventoryItem item = Items[ItemSlotToIndex(itemSlot)];
+            OnCtrlClickItemCallback.Invoke(this, item);
+        }
+
+        public bool AddItemToSlot(InventoryItem item, int row, int col)
+        {
+            Assert.IsTrue(row < Rows && col < Cols, 
+                string.Format("Row or col index out of range", "Row: {0} ({1}), Col: {2} ({3})", row, Rows, col, Cols));
+
+            InventoryItem slot = Items[row * Cols + col];
+            
+
+            if(slot.Data != null)
+            {
+                return false;
+            }
+
+            Items[row * Cols + col] = item;
+            return true;
+        }
+
+        public void UpdateUISprites(SlotInteraction[] slots = null)
+        {
+            slots ??= GetArrangedSlotArray();
+            
+            for(int i = 0; i < slots.Length; i++)
+            {
+                
+                if (Items[i].Data == null)
+                {
+                    slots[i].RemoveSprite();
+                }
+                else if (Items[i].Amount == 0)
+                {
+                    slots[i].RemoveSprite();
+                    Items[i].Data = null;
+                }
+                else
+                {
+                    slots[i].SetSprite(Items[i]);
+                }
+            }
+        }
 
         //Serialize content?
 
         //Resize bag?
+        private void OnValidate()
+        {
+            if(Items.Length != Cols * Rows)
+            {
+                Array.Resize(ref Items, Cols * Rows);
+            }
+            //Clamp item amount between 0 and stacksize
+            for(int i = 0; i < Items.Length; i++)
+            {
+                if (Items[i].Data)
+                {
+                    if (Items[i].Amount > Items[i].Data.StackSize)
+                    {
+                        Items[i].Amount = Items[i].Data.StackSize;
+                    }
+                    else if (Items[i].Amount < 0)
+                    {
+                        Items[i].Amount = 0;
+                    }
+                }
+            }
+
+        }
+        private SlotInteraction[] GetArrangedSlotArray()
+        {
+            SlotInteraction[] slots = UIObject.transform.GetComponentsInChildren<SlotInteraction>();
+
+            Assert.IsTrue(slots.Length == Items.Length, "The item array and amount of slots " +
+                "do not match. It is recommended to regenerate the inventory.");
+
+            SlotInteraction[] orderedSlots = new SlotInteraction[Items.Length];
+            
+            for(int i = 0; i < slots.Length; i++)
+            {
+                int index = ItemSlotToIndex(slots[i].gameObject);
+                orderedSlots[index] = slots[i];
+            }
+
+            return orderedSlots;
+        }
     }
 
+
+    public class ItemComparerAndCompacter : IComparer<InventoryItem>
+    {
+
+        public int Compare(InventoryItem a, InventoryItem b)
+        {
+            if (!a.Data && !b.Data)
+                return 0;
+
+            // Object takes precedence over null
+            if (a.Data == null)
+                return 1;
+            else if (b.Data == null)
+                return -1;
+
+            // Same item type
+            if (a.Data.Category.category == b.Data.Category.category)
+            {
+                // Compare amount
+                return a.Amount < b.Amount ? 1 : a.Amount == b.Amount ? 0 : -1;
+            }
+
+            int aCat = (int)a.Data.Category.category;
+            int bCat = (int)b.Data.Category.category;
+
+            // Lower category takes precedence
+            return aCat < bCat ? -1 : aCat == bCat ? 0 : 1;
+        }
+    }
 
 }

@@ -1,6 +1,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using System.Reflection;
 
 namespace InventorySystem
 {
@@ -15,6 +16,7 @@ namespace InventorySystem
         private const float k_ButtonOffset = 330f;
         private bool m_ShowOptions = false;
         private bool m_HasHeader = false;
+        private bool m_Expanded = false;
         private const float k_HorizontalRuleHeight = 10f;
         private const string k_IndentAsString = "     ";
         private RectTransform m_GroupParent = null;
@@ -24,6 +26,8 @@ namespace InventorySystem
 
             Inventory inventory = property.objectReferenceValue as Inventory;
 
+            // Render Grouping Button if this is the first element of an array
+            #region Render Grouping Button
             if (PropertyIsFirstInArray(property))
             {
                 newPos.y += FetchButtonSize("").y + k_Spacing * 2f;
@@ -32,7 +36,7 @@ namespace InventorySystem
                 UnityEngine.Object target = property.serializedObject.targetObject;
 
                 System.Type type = target.GetType();
-                System.Reflection.FieldInfo field = type.GetField(arrayName);
+                FieldInfo field = type.GetField(arrayName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
 
                 System.Object value = field.GetValue(target);
                 Inventory[] arr = value as Inventory[];
@@ -52,20 +56,20 @@ namespace InventorySystem
                         }
                     }
                 }
-                #region UIGroupButton
+                #region Render UIGroupButton
                 Rect genButtonRect = newPos;
                 genButtonRect.x = FetchLabelSize(k_IndentAsString + arrayName).x;
                 genButtonRect.y -= FetchLabelSize("Generate UIGroup").y * 1.5f;
                 genButtonRect.size = FetchButtonSize("Generate UIGroup");
                 #endregion
-                #region UIGroupLabel
+                #region Render UIGroupLabel
                 Rect groupLabel = genButtonRect;
                 groupLabel.x += groupLabel.size.x + FetchLabelSize(k_IndentAsString).x;
                 groupLabel.size = FetchLabelSize("Group Target:");
                 groupLabel.width = position.width - genButtonRect.width < groupLabel.width ? 0f : groupLabel.width;
                 GUI.Label(groupLabel, "Group Target:");
                 #endregion
-                #region UIGroupObject
+                #region Render UIGroupObject
                 Rect groupParentRect = groupLabel;
                 groupParentRect.x += groupParentRect.size.x + FetchLabelSize(k_IndentAsString).x;
                 groupParentRect.width = Mathf.Clamp(groupParentRect.x +  300,
@@ -81,17 +85,19 @@ namespace InventorySystem
                 genButtonRect.x += genButtonRect.size.x;
 
             }
+            #endregion
 
             EditorGUI.BeginChangeCheck();
 
+            // If the Object field isn't null. Render dropdown button.
             if (inventory)
             {
-                property.isExpanded = DrawDropDown(ref newPos, property.isExpanded, ref m_DropDownAngle);
+                property.isExpanded = m_Expanded = DrawDropDown(ref newPos, m_Expanded, ref m_DropDownAngle);
             }
 
             
 
-
+            // If part of array. Render "Element X"
             string propertyLabel = property.displayName;
             string propPath = property.propertyPath;
             if(propPath.Contains("Array.data["))
@@ -103,13 +109,14 @@ namespace InventorySystem
                 }
             }
                 
-
+            // Render default Object field.
             EditorGUI.PropertyField(newPos, property, new GUIContent(propertyLabel), true);
 
-            newPos.y += FetchObjectFieldSize("").y;
+            newPos.y += FetchObjectFieldSize("").y; // Move next rect down
             
 
 
+            // Resetting GUI and adding spacing if Dropdown is inactive or Object is null.
             if(!property.isExpanded || !inventory)
             {
                 if (inventory)
@@ -125,15 +132,15 @@ namespace InventorySystem
             }
 
 
-            DrawSpace(ref newPos);
+            DrawSpace(ref newPos); // Spacing
 
             Rect buttonRect = newPos;
 
+            // Attach Rendered UI to another UI Parent
             #region AttachToUIButton
             GameObject selection = Selection.activeGameObject;
 
             bool shouldDrawAttachButton = ShouldDrawAttachButton(out RectTransform rect, inventory);
-
             {
                 string labelString;
                 if (shouldDrawAttachButton)
@@ -160,7 +167,7 @@ namespace InventorySystem
                 buttonRect.x = k_ButtonOffset;
                 if (GUI.Button(buttonRect, "Attach To UI Element"))
                 {
-                    inventory.UIParent = rect.gameObject;
+                    inventory.SetUIParent(rect);   
                     if (inventory.UIObject)
                     {
                         inventory.UIObject.transform.SetParent(inventory.UIParent.transform);
@@ -267,10 +274,10 @@ namespace InventorySystem
                     inventory.Headerheight = EditorGUI.FloatField(newPos, "Header Height", inventory.Headerheight);
                     newPos.y += FetchLabelSize("").y;
                     DrawSpace(ref newPos);
-
-                    inventory.UIDragTarget = (EditorGUI.ObjectField(newPos, nameof(inventory.UIDragTarget) +
+                    RectTransform dragTarget = EditorGUI.ObjectField(newPos, nameof(inventory.UIDragTarget) +
                         (inventory.UIDragTarget ? string.Empty : " (Defaulted to self)"),
-                        inventory.UIDragTarget, typeof(RectTransform), true) as RectTransform).gameObject;
+                        inventory.UIDragTarget, typeof(RectTransform), true) as RectTransform;
+                    inventory.UIDragTarget = dragTarget ? dragTarget.gameObject : null;
                     newPos.y += newPos.height;
                     DrawSpace(ref newPos);
                 }

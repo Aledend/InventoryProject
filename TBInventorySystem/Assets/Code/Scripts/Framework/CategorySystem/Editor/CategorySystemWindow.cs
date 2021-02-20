@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace CategorySystem
+namespace CategorySystem.Editor
 {
     public class CategorySystemWindow : EditorWindow
     {
@@ -279,8 +279,8 @@ namespace CategorySystem
             {
                 amountToDelete++;
             }
-            while (it < m_ItemManager.Categories.Length
-            && level < m_ItemManager.FetchCategoryRef(++it).Level(m_ItemManager));
+            while (++it < m_ItemManager.Categories.Length
+            && level < m_ItemManager.FetchCategoryRef(it).Level(m_ItemManager));
 
             for(int i = 0; i < amountToDelete; i++)
             {

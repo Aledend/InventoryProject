@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 663e51f0e2f17024f932aeed8aacb370, type: 3}
+  m_Name: FoodFreshSteak
+  m_EditorClassIdentifier: 
+  Category:
+    category: 3
+  ItemPrefab: {fileID: 1488236837370179344, guid: 2e46c200603748e40ac3ca00d6df12e6, type: 3}
+  ItemSprite: {fileID: 21300000, guid: 67bf1cd50ee23aa4c8d455ee2cf13836, type: 3}
+  StackSize: 16
+  ItemName: Fresh Steak
+  Description: A fine piece.

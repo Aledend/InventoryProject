@@ -1,9 +1,16 @@
 public enum CategoryName
 {
-    Balls,
-    BallsPurple,
-    BallsGreen,
-    Dynamic,
-    Static,
-    StaticBarrel,
+    Food,
+    FoodFresh,
+    FoodFreshApple,
+    FoodFreshSteak,
+    FoodFreshFish,
+    FoodExpired,
+    FoodExpiredSteak,
+    FoodExpiredFish,
+    Cube,
+    CubeLegendary,
+    CubeEpic,
+    CubeUncommon,
+    CATEGORY_MAX
 }

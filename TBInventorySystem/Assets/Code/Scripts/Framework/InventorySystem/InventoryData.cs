@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Assertions;
-
+#if UNITY_EDITOR
+using UnityEditor.Events;
+#endif
 namespace InventorySystem
 {
     [CreateAssetMenu(fileName = "InventoryData", menuName = "ScriptableObjects/InventorySystem/InventoryData")]
@@ -19,10 +21,12 @@ namespace InventorySystem
 
         #region Sprites
         [SerializeField] private Sprite m_SlotHoverSprite = null;
-        [SerializeField] private Sprite m_SlotNormalSprite = null;
+        [SerializeField] private Sprite m_SlotBackgroundSprite = null;
+        [SerializeField] private Sprite m_SlotEmptySprite = null;
 
         public Sprite SlotHoverSprite => m_SlotHoverSprite;
-        public Sprite SlotNormalSprite => m_SlotNormalSprite;
+        public Sprite SlotBackgroundSprite => m_SlotBackgroundSprite;
+        public Sprite SlotEmptySprite => m_SlotEmptySprite;
         #endregion // Sprites
 
         public GameObject CreateBackground(Transform parent) => Instantiate(m_BackgroundPrefab, parent);
@@ -32,9 +36,25 @@ namespace InventorySystem
         private GameObject SceneTarget => m_SceneTarget == null
             ? m_SceneTarget = new GameObject(m_SceneTargetName)
             : m_SceneTarget;
-        public Canvas InventoryCanvas => m_InventoryCanvas == null
-            ? m_InventoryCanvas = Instantiate(m_CanvasPrefab, SceneTarget.transform).GetComponent<Canvas>()
-            : m_InventoryCanvas;
+
+        public Canvas InventoryCanvas {
+            get
+            {
+                if (!m_InventoryCanvas)
+                {
+                    m_InventoryCanvas = Instantiate(m_CanvasPrefab, SceneTarget.transform).GetComponent<Canvas>();
+                    #region Reference Handling
+#if UNITY_EDITOR
+                    Framework.InventorySceneReference sceneRef = m_InventoryCanvas.gameObject
+                        .AddComponent<Framework.InventorySceneReference>();
+                    UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnInventoryCanvas);
+                    sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
+#endif
+#endregion
+                }
+                return m_InventoryCanvas;
+            }
+        }
 
         private void OnEnable()
         {
@@ -45,9 +65,30 @@ namespace InventorySystem
             Assert.IsTrue(m_HeaderPrefab.scene.name == null, "Header is not set.");
             Assert.IsTrue(m_InventoryGroupPrefab.scene.name == null, "Header is not set.");
             Assert.IsNotNull(m_SlotHoverSprite, "Slot Sprite is not set.");
-            Assert.IsNotNull(m_SlotNormalSprite, "Slot Hover Sprite is not set.");
+            Assert.IsNotNull(m_SlotBackgroundSprite, "Slot Hover Sprite is not set.");
+            Assert.IsNotNull(m_SlotEmptySprite, "Slot Empty Sprite is not set.");
             #endregion // Asserts
         }
 
+        #region Reference Handling
+        /// <summary>
+        /// Sent to generated canvas to keep reference to scene object alive.
+        /// </summary>
+        /// <param name="canvas">The stored scene reference.</param>
+        public void ReturnInventoryCanvas(Framework.InventorySceneReference sceneRef, GameObject canvas)
+        {
+            if (m_InventoryCanvas == null)
+            {
+                m_InventoryCanvas = canvas.GetComponent<Canvas>();
+            }
+            else if (m_InventoryCanvas != canvas.GetComponent<Canvas>()) 
+            {
+                if (Application.isPlaying)
+                    Destroy(sceneRef);
+                else
+                    DestroyImmediate(sceneRef);
+            }
+        }
+        #endregion
     }
 }

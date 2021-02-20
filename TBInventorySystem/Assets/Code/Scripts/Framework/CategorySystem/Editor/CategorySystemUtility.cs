@@ -20,6 +20,7 @@ namespace CategorySystem
                 StreamWriter fileCreate = File.CreateText(enumPath);
                 fileCreate.WriteLine("public enum ECategory" +
                     "{" +
+                    "CATEGORY_MAX" +
                     "}");
                 fileCreate.Close();
             }
@@ -36,7 +37,7 @@ namespace CategorySystem
                 }
             }
 
-            Assert.IsTrue(lines.Length >= 3, "File contains too few lines to be valid.");
+            Assert.IsTrue(lines.Length >= 4, "File contains too few lines to be valid.");
 
             StreamWriter fileWrite = new StreamWriter(enumPath);
             for(int i = 0; i < index + offset; i++)
@@ -62,12 +63,15 @@ namespace CategorySystem
                 StreamWriter fileCreate = File.CreateText(enumPath);
                 fileCreate.WriteLine("public enum ECategory" +
                     "{" +
+                    "CATEGORY_MAX" +
                     "}");
                 fileCreate.Close();
             }
             #endregion // MakeSureFileExists
 
             string[] lines = File.ReadAllLines(enumPath);
+
+            Assert.IsTrue(lines.Length >= 4, "File contains too few lines to be valid.");
 
             StreamWriter fileWrite = new StreamWriter(enumPath);
             int ignore = offset + index;

@@ -10,20 +10,27 @@ namespace InventorySystem.Framework
     [ExecuteAlways]
     public class InventorySceneReference : MonoBehaviour
     {
-        public UnityEvent<GameObject> ReturnObject = new UnityEvent<GameObject>();
+        public UnityEvent<InventorySceneReference, GameObject> ReturnObject = new UnityEvent<InventorySceneReference, GameObject>();
 
         private void OnEnable()
         {
-            if (ReturnObject != null)
-                ReturnObject.Invoke(gameObject);
+            Return();
         }
 
         private void Awake()  
         {
-            if(ReturnObject != null)
-                ReturnObject.Invoke(gameObject);
+            Return();
         }
 
-        
+        private void Return()
+        {
+            if (ReturnObject != null)
+                ReturnObject.Invoke(this, gameObject);
+
+            if(Application.isPlaying)
+            {
+                Destroy(this);
+            }
+        }
     }
 }

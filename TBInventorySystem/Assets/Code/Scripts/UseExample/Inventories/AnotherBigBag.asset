@@ -1,0 +1,194 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59179d15d491d454e8c49fd3e94846a7, type: 3}
+  m_Name: AnotherBigBag
+  m_EditorClassIdentifier: 
+  Rows: 8
+  Cols: 10
+  SlotWidth: 30
+  Padding: 5
+  Headerheight: 20
+  InventoryToggle: 98
+  HideOnPlay: 1
+  DrawHeader: 1
+  UIDragTarget: {fileID: 0}
+  UIParent: {fileID: 0}
+  UIObject: {fileID: 0}
+  m_InventoryData: {fileID: 11400000, guid: 7bc1d29162fb4724d943f529ff06ff45, type: 2}
+  Items:
+  - Data: {fileID: 11400000, guid: c1566e12f242757448594da5c359528f, type: 2}
+    Amount: 1
+  - Data: {fileID: 11400000, guid: 23f40e7812301024c971f35b7f8559db, type: 2}
+    Amount: 2
+  - Data: {fileID: 11400000, guid: 475495f4a67164b459eb2ea57734ccd9, type: 2}
+    Amount: 12
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: a14c6468304b2804fbfce43306f1011c, type: 2}
+    Amount: 1
+  - Data: {fileID: 11400000, guid: c1566e12f242757448594da5c359528f, type: 2}
+    Amount: 1
+  - Data: {fileID: 11400000, guid: 23f40e7812301024c971f35b7f8559db, type: 2}
+    Amount: 11
+  - Data: {fileID: 11400000, guid: 23f40e7812301024c971f35b7f8559db, type: 2}
+    Amount: 10
+  - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
+    Amount: 9
+  - Data: {fileID: 11400000, guid: 23f40e7812301024c971f35b7f8559db, type: 2}
+    Amount: 6
+  - Data: {fileID: 0}
+    Amount: 3
+  - Data: {fileID: 11400000, guid: c1566e12f242757448594da5c359528f, type: 2}
+    Amount: 1
+  - Data: {fileID: 0}
+    Amount: 2
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 6
+  - Data: {fileID: 0}
+    Amount: 10
+  - Data: {fileID: 0}
+    Amount: 3
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
+    Amount: 10
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: 088edd15284fdcf4986cbada317623e6, type: 2}
+    Amount: 1
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: 23f40e7812301024c971f35b7f8559db, type: 2}
+    Amount: 10
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: c1566e12f242757448594da5c359528f, type: 2}
+    Amount: 1
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: 475495f4a67164b459eb2ea57734ccd9, type: 2}
+    Amount: 16
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: 475495f4a67164b459eb2ea57734ccd9, type: 2}
+    Amount: 8
+  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
+    Amount: 13
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  Slots: []
+  OnShiftClickItemCallback:
+    m_PersistentCalls:
+      m_Calls: []
+  OnCtrlClickItemCallback:
+    m_PersistentCalls:
+      m_Calls: []

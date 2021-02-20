@@ -4,15 +4,14 @@ using UnityEngine;
 using UnityEditor;
 #endif // UNITY_EDITOR
 
-namespace CategorySystem
+namespace CategorySystem.Editor
 {
-
+#if UNITY_EDITOR
     [System.Serializable]
     public struct CategoryData
     {
         public CategoryName Category;
         [HideInInspector] public CategoryName ParentCategory;
-
         [SerializeField] [HideInInspector] private string m_RefreshCategory;
         [SerializeField] [HideInInspector] private string m_RefreshParent;
 
@@ -32,6 +31,16 @@ namespace CategorySystem
             m_RefreshCategory = category;
             m_RefreshParent = parentCategory;
         }
+
+        public CategoryData(CategoryName category, CategoryName parentCategory)
+        {
+            Category = category;
+            ParentCategory = parentCategory;
+
+            m_RefreshCategory = "";
+            m_RefreshParent = "";
+        }
+
 
         public string GetName()
         {
@@ -59,7 +68,6 @@ namespace CategorySystem
             }
             return level;
         }
-
         /// <summary>
         /// The CategoryTool takes some time to reload scripts.
         /// Use this to make sure Enum values aren't overwritten.
@@ -151,4 +159,5 @@ namespace CategorySystem
         #endregion // Editor
     }
 
+#endif
 }
