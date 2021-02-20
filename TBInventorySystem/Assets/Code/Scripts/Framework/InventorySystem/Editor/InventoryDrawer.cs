@@ -80,6 +80,13 @@ namespace InventorySystem
                 if(GUI.Button(genButtonRect, "Generate UIGroup") && first)
                 {
                     first.GenerateUIGroup(arr, m_GroupParent);
+
+                    Framework.InventorySceneReference[] references = GameObject.FindObjectsOfType<Framework.InventorySceneReference>();
+                    for (int i = 0; i < references.Length; i++)
+                    {
+                        if (references[i])
+                            references[i].ReturnObject.Invoke(references[i], references[i].gameObject);
+                    }
                 }
                 GUI.enabled = true;
                 genButtonRect.x += genButtonRect.size.x;

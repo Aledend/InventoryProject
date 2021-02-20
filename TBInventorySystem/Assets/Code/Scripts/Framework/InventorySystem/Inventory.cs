@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.Events;
 #if UNITY_EDITOR
+using UnityEditor.SceneManagement;
 using UnityEditor.Events;
 #endif
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Assertions;
+using InventorySystem.Framework;
 
 namespace InventorySystem
 {
-    using Framework;
-    using UnityEngine.Assertions;
 
     [System.Serializable]
     public struct InventoryItem
@@ -319,6 +320,10 @@ namespace InventorySystem
 
             UIObject = background;
             UIParent = parent.gameObject;
+
+#if UNITY_EDITOR
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+#endif
         }
 
         public void ReturnUIObject(InventorySceneReference sceneRef, GameObject uiObject)
@@ -333,6 +338,7 @@ namespace InventorySystem
             }
             else if(UIParent != uiParent)
             {
+                Debug.Log("Destroying UIParent");
                 if (Application.isPlaying)
                     Destroy(sceneRef);
                 else
