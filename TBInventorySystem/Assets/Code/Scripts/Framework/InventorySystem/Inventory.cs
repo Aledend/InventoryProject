@@ -272,13 +272,11 @@ namespace InventorySystem
             }
             if (inParentGroup)
             {
-                Debug.Log("setting parent");
                 // Drag target (Group Parent)
                 SetUIDragTarget(inParentGroup.GetComponent<RectTransform>());
             }
             else
             {
-                Debug.Log("setting self");
                 // Drag target (Self)
                 SetUIDragTarget(background.GetComponent<RectTransform>());
             }
@@ -358,7 +356,6 @@ namespace InventorySystem
 
         public void ReturnUIObject(InventorySceneReference sceneRef, GameObject uiObject)
         {
-            //Debug.Log("destroyign uiobject " + uiObject + "  and  " + UIObject + sceneRef.ReturnObject);
             if (uiObject == null)
             {
                 if (Application.isPlaying)
@@ -372,7 +369,6 @@ namespace InventorySystem
             }
             else if (UIObject != uiObject)
             {
-                Debug.Log("destroying uiobject");
                 if (Application.isPlaying)
                     Destroy(uiObject);
                 else
@@ -380,7 +376,6 @@ namespace InventorySystem
                     DestroyImmediate(uiObject);
                 }
             }
-            //ReturnObject(ref UIObject, uiObject);
         }
         public void ReturnUIParent(InventorySceneReference sceneRef, GameObject uiParent)
         {
@@ -390,7 +385,6 @@ namespace InventorySystem
             }
             else if (UIParent != uiParent)
             {
-                Debug.Log("destroying parent");
                 if (Application.isPlaying)
                     Destroy(uiParent);
                 else
@@ -398,18 +392,6 @@ namespace InventorySystem
                     DestroyImmediate(uiParent);
                 }
             }
-            //if(UIParent == null)
-            //{
-            //    UIParent = uiParent;
-            //}
-            //else if(UIParent != uiParent)
-            //{
-            //    Debug.Log("destroyign sceneref");
-            //    if (Application.isPlaying)
-            //        Destroy(sceneRef);
-            //    else
-            //        DestroyImmediate(sceneRef);
-            //}
         }
         public void ReturnUIDragTarget(InventorySceneReference sceneRef, GameObject uiDragTarget)
         {
@@ -419,7 +401,6 @@ namespace InventorySystem
             }
             else if (UIDragTarget != uiDragTarget)
             {
-                Debug.Log("destroying dragtarget");
                 if (Application.isPlaying)
                     Destroy(uiDragTarget);
                 else
@@ -496,7 +477,6 @@ namespace InventorySystem
 #if UNITY_EDITOR
             foreach(InventorySceneReference reference in parent.GetComponents<InventorySceneReference>())
             {
-                Debug.Log(reference == this);
                 if(reference.InventoryReference == this)
                 {
                     return;
