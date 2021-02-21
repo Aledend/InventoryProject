@@ -224,7 +224,7 @@ namespace InventorySystem
 
 
             float inventoryPadding = 15f;
-            Rect latestPosition = CalculateInitialPosition(inventoryPadding, in groupParent);
+            Rect latestPosition = CalculateInitialPosition(inventoryPadding);
             PositionUIElement(ref latestPosition);
             float maxWidth = UIObject.GetComponent<RectTransform>().rect.width;
 
@@ -240,10 +240,6 @@ namespace InventorySystem
             }
         }
 
-        public void GenerateUI(in RectTransform inParentGroup, ref Vector2 latestPosition)
-        {
-            GenerateUI(inParentGroup);
-        }
 
         private void PositionUIElement(ref Rect latestPosition)
         {
@@ -406,7 +402,7 @@ namespace InventorySystem
             }
         }
 
-        public Rect CalculateInitialPosition(float padding, in RectTransform parent)
+        public Rect CalculateInitialPosition(float padding)
         { 
             Rect r = new Rect();
             Vector2 size = CalculateObjectSize();
@@ -563,8 +559,7 @@ namespace InventorySystem
             return false;
         }
 
-        public void SwapItems(Inventory otherInventory, int otherIndex, InventoryItem otherItem,
-            InventoryItem thisItem, int thisIndex)
+        public void SwapItems(Inventory otherInventory, int otherIndex, int thisIndex)
         {
             
             otherInventory.TakeAll(otherIndex, out InventoryItem tempOther);
@@ -572,21 +567,6 @@ namespace InventorySystem
 
             otherInventory.AddItemToSlot(tempThis, otherIndex);
             AddItemToSlot(tempOther, thisIndex);
-        }
-
-        public InventoryItem[] FetchInventoryGroup(Inventory[] inventories)
-        {
-            List<InventoryItem> items = new List<InventoryItem>();
-
-            foreach(Inventory inv in inventories)
-            {
-                if(inv != null)
-                {
-                    items.AddRange(inv.FetchInventory());
-                }
-            }
-
-            return items.ToArray();
         }
 
         /// <summary>

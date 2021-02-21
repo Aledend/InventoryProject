@@ -21,7 +21,6 @@ public class PlayerInventory : MonoBehaviour
     private Image m_DraggedItemUI = null;
     private InventoryItem m_DraggedItem;
     private Inventory m_DragSource = null;
-    private InventoryItem m_CurrentHoveringItem;
     private Inventory m_CurrentHoveringInventory = null;
     private int m_CurrentHoveringIndex = 0;
     private int m_DragSourceIndex = -1;
@@ -57,11 +56,7 @@ public class PlayerInventory : MonoBehaviour
                 {
                     if(m_CurrentHoveringIndex != -1)
                     {
-                        if (!m_CurrentHoveringInventory.AddItemToSlot(m_DraggedItem, m_CurrentHoveringIndex))
-                        {
-                            m_CurrentHoveringInventory.SwapItems(m_DragSource, m_DragSourceIndex, m_DraggedItem,
-                                m_CurrentHoveringItem, m_CurrentHoveringIndex);
-                        }
+                        m_CurrentHoveringInventory.SwapItems(m_DragSource, m_DragSourceIndex, m_CurrentHoveringIndex);
 
                         Destroy(m_DraggedItemUI.transform.parent.gameObject);
                     }
@@ -78,7 +73,6 @@ public class PlayerInventory : MonoBehaviour
         {
             m_CurrentHoveringInventory = inventory;
             m_CurrentHoveringIndex = index;
-            m_CurrentHoveringItem = item;
         }
     }
 
@@ -88,7 +82,6 @@ public class PlayerInventory : MonoBehaviour
         {
             m_CurrentHoveringInventory = null;
             m_CurrentHoveringIndex = -1;
-            m_CurrentHoveringItem = new InventoryItem();
         }
     }
 
@@ -114,28 +107,6 @@ public class PlayerInventory : MonoBehaviour
                 m_HeldItem = m_QuickslotInventory.FetchItem(i);
                 OnItemSelect.Invoke(m_HeldItem, i);
             }
-        }
-    }
-
-    public void OnMouseUpQuickSlot(Inventory inventory, InventoryItem item, int index)
-    {
-        if (m_Dragging)
-        {
-            if(!inventory.AddItemToSlot(m_DraggedItem, index))
-            {
-                inventory.SwapItems(m_DragSource, m_DragSourceIndex, m_DraggedItem, item, index);
-            }
-
-            Destroy(m_DraggedItemUI.transform.parent.gameObject);
-            m_Dragging = false;
-        }
-    }
-
-    public void OnMouseUpInventory(Inventory inventory, InventoryItem item, int index)
-    {
-        if (m_Dragging)
-        {
-            
         }
     }
 
@@ -196,7 +167,8 @@ public class PlayerInventory : MonoBehaviour
         }
         else
         {
-            if (inventory.TakeAll(index, out m_DraggedItem))
+            InventoryItem fetch = inventory.FetchItem(index);
+            if (fetch.Data != null)
             {
                 GameObject go = new GameObject("Temporary item icon canvas");
 

@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody m_HeldItemRigidBody = null;
     private bool m_HoldingItem = false;
     private int m_HoldingIndex = 0;
-    private float m_Speed = 5f;
+    private readonly float m_Speed = 5f;
 
     [SerializeField] private LayerMask m_PreviewMask;
 
