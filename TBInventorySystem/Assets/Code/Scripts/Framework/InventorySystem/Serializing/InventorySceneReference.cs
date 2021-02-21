@@ -11,6 +11,7 @@ namespace InventorySystem.Framework
     public class InventorySceneReference : MonoBehaviour
     {
         public UnityEvent<InventorySceneReference, GameObject> ReturnObject = new UnityEvent<InventorySceneReference, GameObject>();
+        [HideInInspector] public Inventory InventoryReference = null;
 
         private void OnEnable()
         {

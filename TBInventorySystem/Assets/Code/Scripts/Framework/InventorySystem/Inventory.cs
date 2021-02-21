@@ -268,23 +268,16 @@ namespace InventorySystem
             // UIParent
             if (!regenerating)
             {
-                sceneRef = parent.gameObject.AddComponent<InventorySceneReference>();
-                UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIParent);
-                sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
-            }
+                SetUIParent(parent.GetComponent<RectTransform>());}
             if (inParentGroup)
             {
                 // Drag target (Group Parent)
-                sceneRef = inParentGroup.gameObject.AddComponent<InventorySceneReference>(); 
-                UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIDragTarget); 
-                sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
+                SetUIDragTarget(inParentGroup.GetComponent<RectTransform>());
             }
             else
             {
                 // Drag target (Self)
-                sceneRef = background.AddComponent<InventorySceneReference>();
-                UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIDragTarget);
-                sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
+                SetUIDragTarget(background.GetComponent<RectTransform>());
             }
             #endif
             #endregion // Reference Handling
@@ -362,45 +355,74 @@ namespace InventorySystem
 
         public void ReturnUIObject(InventorySceneReference sceneRef, GameObject uiObject)
         {
-            ReturnObject(ref UIObject, uiObject);
-        }
-        public void ReturnUIParent(InventorySceneReference sceneRef, GameObject uiParent)
-        {
-            if(UIParent == null)
-            {
-                UIParent = uiParent;
-            }
-            else if(UIParent != uiParent)
+            //Debug.Log("destroyign uiobject " + uiObject + "  and  " + UIObject + sceneRef.ReturnObject);
+            if (uiObject == null)
             {
                 if (Application.isPlaying)
                     Destroy(sceneRef);
                 else
                     DestroyImmediate(sceneRef);
             }
+            else if (UIObject == null)
+            {
+                UIObject = uiObject;
+            }
+            else if (UIObject != uiObject)
+            {
+                if (Application.isPlaying)
+                    Destroy(uiObject);
+                else
+                {
+                    DestroyImmediate(uiObject);
+                }
+            }
+            //ReturnObject(ref UIObject, uiObject);
+        }
+        public void ReturnUIParent(InventorySceneReference sceneRef, GameObject uiParent)
+        {
+            if (UIParent == null)
+            {
+                UIParent = uiParent;
+            }
+            else if (UIParent != uiParent)
+            {
+                if (Application.isPlaying)
+                    Destroy(uiParent);
+                else
+                {
+                    DestroyImmediate(uiParent);
+                }
+            }
+            //if(UIParent == null)
+            //{
+            //    UIParent = uiParent;
+            //}
+            //else if(UIParent != uiParent)
+            //{
+            //    Debug.Log("destroyign sceneref");
+            //    if (Application.isPlaying)
+            //        Destroy(sceneRef);
+            //    else
+            //        DestroyImmediate(sceneRef);
+            //}
         }
         public void ReturnUIDragTarget(InventorySceneReference sceneRef, GameObject uiDragTarget)
         {
-
-            ReturnObject(ref UIDragTarget, uiDragTarget);
-        } 
-
-        public void ReturnObject(ref GameObject go, GameObject inObject)
-        {
-            
-            if(go == null) 
+            if (UIDragTarget == null)
             {
-                go = inObject;
-            } 
-            else if(go != inObject)
+                UIDragTarget = uiDragTarget;
+            }
+            else if (UIDragTarget != uiDragTarget)
             {
                 if (Application.isPlaying)
-                    Destroy(inObject);
+                    Destroy(uiDragTarget);
                 else
                 {
-                    DestroyImmediate(inObject);
+                    DestroyImmediate(uiDragTarget);
                 }
             }
-        }
+        } 
+
 
         public Rect CalculateInitialPosition(float padding)
         { 
@@ -466,11 +488,41 @@ namespace InventorySystem
         {
             UIParent = parent.gameObject;
 #if UNITY_EDITOR
+            foreach(InventorySceneReference reference in parent.GetComponents<InventorySceneReference>())
+            {
+                Debug.Log(reference == this);
+                if(reference.InventoryReference == this)
+                {
+                    return;
+                }
+            }
+
             InventorySceneReference sceneRef = parent.gameObject.AddComponent<InventorySceneReference>();
+            sceneRef.InventoryReference = this;
             UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIParent);
             sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
 #endif
         }
+
+        private void SetUIDragTarget(RectTransform target)
+        {
+            UIDragTarget = target.gameObject;
+#if UNITY_EDITOR
+            foreach (InventorySceneReference reference in target.GetComponents<InventorySceneReference>())
+            {
+                if (reference.InventoryReference == this)
+                {
+                    return;
+                }
+            }
+
+            InventorySceneReference sceneRef = target.gameObject.AddComponent<InventorySceneReference>();
+            sceneRef.InventoryReference = this;
+            UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIDragTarget);
+            sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
+#endif // UNITY_EDITOR
+        }
+
         #endregion // Inventory UI
 
         /// <summary>
