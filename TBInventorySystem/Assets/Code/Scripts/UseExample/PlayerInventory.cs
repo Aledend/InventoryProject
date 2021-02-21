@@ -125,7 +125,8 @@ public class PlayerInventory : MonoBehaviour
         }
         else
         {
-            if (inventory.TakeAll(index, out m_DraggedItem))
+            InventoryItem fetch = inventory.FetchItem(index);
+            if (fetch.Data != null)
             {
                 GameObject go = new GameObject("Temporary item icon canvas");
                 
