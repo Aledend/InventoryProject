@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.Events;
-#if UNITY_EDITOR
-using UnityEditor.SceneManagement;
-using UnityEditor.Events;
-#endif
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Assertions;
 using InventorySystem.Framework;
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+using UnityEditor.Events;
+#endif
 
 namespace InventorySystem
 {
@@ -85,24 +85,24 @@ namespace InventorySystem
         public InventoryData m_InventoryData;
 
         public InventoryItem[] Items;
-        public SlotInteraction[] Slots;
+        [HideInInspector] public SlotInteraction[] Slots;
 
-        public UnityEvent<Inventory, InventoryItem, int> OnMouseDownInventorySlot = 
+        #region UnityEvent's
+        [HideInInspector] public UnityEvent<Inventory, InventoryItem, int> OnMouseDownInventorySlot = 
             new UnityEvent<Inventory, InventoryItem, int>();
-        public UnityEvent<Inventory, InventoryItem, int> OnMouseUpInventorySlot = 
+        [HideInInspector] public UnityEvent<Inventory, InventoryItem, int> OnMouseUpInventorySlot = 
             new UnityEvent<Inventory, InventoryItem, int>();
-        public UnityEvent<Inventory, InventoryItem, int> OnMouseEnterInventorySlot =
+        [HideInInspector] public UnityEvent<Inventory, InventoryItem, int> OnMouseEnterInventorySlot =
             new UnityEvent<Inventory, InventoryItem, int>();
-        public UnityEvent<Inventory, InventoryItem, int> OnMouseExitInventorySlot =
+        [HideInInspector] public UnityEvent<Inventory, InventoryItem, int> OnMouseExitInventorySlot =
             new UnityEvent<Inventory, InventoryItem, int>();
+        #endregion
 
         // Handles showing and hiding of UI
         #region InputHandling
         // Toggling function applied to the given input listener in OnBeforeSceneLoadRuntimeMethod
         private void ToggleActive()
         {
-
-            
             if(UIObject)
             {
                 if (UIObject.activeSelf)
@@ -138,7 +138,10 @@ namespace InventorySystem
                 Items = new InventoryItem[Rows * Cols];
             }
 
-            UpdateUISprites();
+            if(UIObject && Application.isPlaying)
+            {
+                UpdateUISprites();
+            }
         }
 
 #if UNITY_EDITOR
@@ -173,11 +176,21 @@ namespace InventorySystem
 #endregion // ToggleInput
 
         // Handles generating and destroying of UI
-#region InventoryUI
-        public void RegenerateUI(in RectTransform parent = null)
+        #region InventoryUI
+        public void RegenerateUI(RectTransform parent = null, bool keepSizeAndPosition = true)
         {
+            RectTransformData rectData = null;
+
+            if(UIObject)
+            {
+                rectData = new RectTransformData(UIObject.GetComponent<RectTransform>());
+            }
+
+            if (!parent)
+                parent = UIParent.GetComponent<RectTransform>();
+
             DestroyUI();
-            GenerateUI(parent, true);   
+            GenerateUI(parent, true, keepSizeAndPosition, rectData);   
         }
 
         public void DestroyUI()
@@ -202,7 +215,7 @@ namespace InventorySystem
             Array.ForEach(inventories, inv => {
                 if (inv != null)
                 {
-                    inv.RegenerateUI(groupParent);
+                    inv.RegenerateUI(groupParent, false);
                     RectTransform invTrans = inv.UIObject.GetComponent<RectTransform>();
                     invTrans.anchorMax = new Vector2(1f, 0f);
                     invTrans.anchorMin = new Vector2(1f, 0f);
@@ -237,8 +250,11 @@ namespace InventorySystem
             UIObject.GetComponent<RectTransform>().anchoredPosition = latestPosition.position;
         }
 
-        public void GenerateUI(in RectTransform inParentGroup = null, bool regenerating = false)
+        public void GenerateUI(in RectTransform inParentGroup = null, bool regenerating = false, 
+            bool keepSizeAndPosition = false, RectTransformData rectData = null)
         {
+            OnValidate();
+
             Transform parent = inParentGroup ? inParentGroup
                 : UIParent ? UIParent.GetComponent<RectTransform>()
                 : m_InventoryData.InventoryCanvas.transform;
@@ -246,8 +262,8 @@ namespace InventorySystem
             GameObject background = m_InventoryData.CreateBackground(parent);
 
             // Keep references to scene objects alive in Editor and Builds.
-#region Scene Object Reference handling
-#if UNITY_EDITOR
+            #region Scene Object Reference handling
+            #if UNITY_EDITOR
             // UIObject
             InventorySceneReference sceneRef = background.AddComponent<InventorySceneReference>();
             UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIObject);
@@ -274,17 +290,20 @@ namespace InventorySystem
                 UnityEventTools.AddPersistentListener(sceneRef.ReturnObject, ReturnUIDragTarget);
                 sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
             }
-#endif
-#endregion // Reference Handling
+            #endif
+            #endregion // Reference Handling
 
             Vector2 innerSize = CalculateInnerSize();
             Vector2 backgroundSize = CalculateObjectSize();
 
-
-            background.GetComponent<RectTransform>().sizeDelta = backgroundSize;
+            if (keepSizeAndPosition && rectData != null)
+                rectData.WriteToRect(background.GetComponent<RectTransform>());
 
             Image m_BackgroundImage = background.GetComponent<Image>();
+            m_BackgroundImage.rectTransform.sizeDelta = backgroundSize;
 
+
+            #region Generate Header
             if (DrawHeader)
             {
                 GameObject header = m_InventoryData.CreateHeader(background.transform);
@@ -303,9 +322,9 @@ namespace InventorySystem
                 header.AddComponent<HeaderInteraction>().BindDragTarget(
                     UIDragTarget ? UIDragTarget.GetComponent<RectTransform>() : m_BackgroundImage.rectTransform);
             }
+            #endregion // Generate Header
 
-
-
+            #region Generate Slots UI
             for (int y = 0; y < Rows; y++)
             {
                 for (int x = 0; x < Cols; x++)
@@ -335,6 +354,7 @@ namespace InventorySystem
                     }
                 }
             }
+            #endregion // Generate Slots UI
 
             UIObject = background;
             UIParent = parent.gameObject;
@@ -364,13 +384,14 @@ namespace InventorySystem
         }
         public void ReturnUIDragTarget(InventorySceneReference sceneRef, GameObject uiDragTarget)
         {
+
             ReturnObject(ref UIDragTarget, uiDragTarget);
         } 
 
         public void ReturnObject(ref GameObject go, GameObject inObject)
         {
             
-            if(go == null)
+            if(go == null) 
             {
                 go = inObject;
             } 
@@ -379,7 +400,9 @@ namespace InventorySystem
                 if (Application.isPlaying)
                     Destroy(inObject);
                 else
+                {
                     DestroyImmediate(inObject);
+                }
             }
         }
 
@@ -394,13 +417,15 @@ namespace InventorySystem
         }
 
         /// <summary>
-        /// 
+        /// Positions Multiple inventories after each other, Starting from
+        /// the bottom right corner and wraps around when reaching the upper
+        /// screen bounds.
         /// </summary>
-        /// <param name="padding"></param>
-        /// <param name="latestPosition"></param>
-        /// <param name="parent"></param>
-        /// <param name="inv"></param>
-        /// <param name="maxWidth"></param>
+        /// <param name="padding">Distance between inventories</param>
+        /// <param name="latestPosition">Rect of last inventorie that was drawn.</param>
+        /// <param name="parent">Group Parent</param>
+        /// <param name="inv">Which inventory to adjust size after.</param>
+        /// <param name="maxWidth">Widest inventory so far.</param>
         /// <returns></returns>
         public Rect CalculatePosition(float padding, ref Rect latestPosition,
             in RectTransform parent, in Inventory inv, ref float maxWidth)
@@ -481,7 +506,7 @@ namespace InventorySystem
         /// Takes inventoryitem and decrements amount.
         /// </summary>
         /// <param name="index"></param>
-        /// <returns></returns>
+        /// <returns>If there is a valid item on the given index</returns>
         public bool TakeItem(int index, out InventoryItem item)
         {
             InventoryItem invItem = Items[index];
@@ -566,6 +591,13 @@ namespace InventorySystem
             return items.ToArray();
         }
 
+        /// <summary>
+        /// Calculate the item slots position relative to its root's parent.
+        /// Warning: Changing the hierarchy of the itemslot prefab may cause
+        /// issues when calculating slotTopLeft
+        /// </summary>
+        /// <param name="itemSlot">The itemslot UI object</param>
+        /// <returns>Itemslot index</returns>
         public int ItemSlotToIndex(GameObject itemSlot)
         {
             Vector2 size = CalculateInnerSize();
@@ -592,6 +624,10 @@ namespace InventorySystem
             UpdateUISprites();
         }
 
+        /// <summary>
+        /// Merge items of the same type together.
+        /// </summary>
+        /// <param name="slots"></param>
         private void MergeStacks(SlotInteraction[] slots = null)
         {
             slots ??= GetArrangedSlotArray();
@@ -709,9 +745,6 @@ namespace InventorySystem
             UpdateUISprites(slots);
         }
 
-        //Serialize content?
-
-        //Resize bag?
         private void OnValidate()
         {
             if(Items.Length != Cols * Rows)
@@ -741,7 +774,8 @@ namespace InventorySystem
             SlotInteraction[] slots = UIObject.transform.GetComponentsInChildren<SlotInteraction>();
 
             Assert.IsTrue(slots.Length == Items.Length, "The item array and amount of slots " +
-                "do not match. It is recommended to regenerate the inventory.");
+                "do not match.\n It is recommended to regenerate the inventory. (Slots: " + slots.Length 
+                + ", Items: " + Items.Length + ", " + this + ")");
 
             SlotInteraction[] orderedSlots = new SlotInteraction[Items.Length];
             

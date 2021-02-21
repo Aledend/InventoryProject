@@ -18,7 +18,7 @@ MonoBehaviour:
   Padding: 5
   Headerheight: 10
   InventoryToggle: 98
-  HideOnPlay: 0
+  HideOnPlay: 1
   DrawHeader: 1
   UIDragTarget: {fileID: 0}
   UIParent: {fileID: 0}
@@ -27,6 +27,26 @@ MonoBehaviour:
   Items:
   - Data: {fileID: 0}
     Amount: 0
+  - Data: {fileID: 11400000, guid: a14c6468304b2804fbfce43306f1011c, type: 2}
+    Amount: 1
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: a14c6468304b2804fbfce43306f1011c, type: 2}
+    Amount: 1
+  - Data: {fileID: 11400000, guid: c1566e12f242757448594da5c359528f, type: 2}
+    Amount: 1
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
+    Amount: 11
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: 088edd15284fdcf4986cbada317623e6, type: 2}
+    Amount: 1
   - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 0}
@@ -39,6 +59,8 @@ MonoBehaviour:
     Amount: 0
   - Data: {fileID: 0}
     Amount: 0
+  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
+    Amount: 12
   - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 0}
@@ -49,36 +71,20 @@ MonoBehaviour:
     Amount: 0
   - Data: {fileID: 0}
     Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
+  - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
+    Amount: 5
   - Data: {fileID: 0}
     Amount: 0
   Slots: []
-  OnShiftClickItemCallback:
+  OnMouseDownInventorySlot:
     m_PersistentCalls:
       m_Calls: []
-  OnCtrlClickItemCallback:
+  OnMouseUpInventorySlot:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMouseEnterInventorySlot:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMouseExitInventorySlot:
     m_PersistentCalls:
       m_Calls: []

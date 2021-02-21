@@ -5,6 +5,11 @@ using System.Reflection;
 
 namespace InventorySystem
 {
+
+    /// <summary>
+    /// Turns Serialized Inventory properties and arrays into 
+    /// editable tools.
+    /// </summary>
     [CustomPropertyDrawer(typeof(Inventory))]
     public class InventoryDrawer : PropertyDrawer
     {
@@ -20,6 +25,7 @@ namespace InventorySystem
         private const float k_HorizontalRuleHeight = 10f;
         private const string k_IndentAsString = "     ";
         private RectTransform m_GroupParent = null;
+
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             Rect newPos = position;
@@ -81,6 +87,7 @@ namespace InventorySystem
                 {
                     first.GenerateUIGroup(arr, m_GroupParent);
 
+                    // Make sure old parents delete themselves.
                     Framework.InventorySceneReference[] references = GameObject.FindObjectsOfType<Framework.InventorySceneReference>();
                     for (int i = 0; i < references.Length; i++)
                     {
@@ -237,8 +244,8 @@ namespace InventorySystem
                 if (GUI.Button(buttonRect, "Regenerate"))
                 {
                     RectTransformData data = new RectTransformData(inventory.UIObject.GetComponent<RectTransform>());
-                    inventory.RegenerateUI();
-                    data.WriteToRect(inventory.UIObject.GetComponent<RectTransform>());
+                    inventory.RegenerateUI(null, false);
+                    data.WriteToRect(inventory.UIObject.GetComponent<RectTransform>(), false);
                 }
                 buttonRect.x += buttonRect.width + k_Spacing;
 
@@ -307,6 +314,7 @@ namespace InventorySystem
             DrawSpace(ref newPos);
 
         }
+
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             float height = EditorGUI.GetPropertyHeight(property, label, true) * 1.2f;
@@ -448,40 +456,5 @@ namespace InventorySystem
             position.y += k_Spacing;
         }
     }
-
-    public class RectTransformData
-    {
-        private Vector3 m_LocalPosition;
-        private Vector2 m_AnchoredPosition;
-        private Vector2 m_SizeDelta;
-        private Vector2 m_AnchorMin;
-        private Vector2 m_AnchorMax;
-        private Vector2 m_Pivot;
-        private Vector3 m_Scale;
-        private Quaternion m_Rotation;
-
-        public RectTransformData(RectTransform rectTransform)
-        {
-            m_LocalPosition = rectTransform.localPosition;
-            m_AnchoredPosition = rectTransform.anchoredPosition;
-            m_SizeDelta = rectTransform.sizeDelta;
-            m_AnchorMin = rectTransform.anchorMin;
-            m_AnchorMax = rectTransform.anchorMax;
-            m_Pivot = rectTransform.pivot;
-            m_Scale = rectTransform.localScale;
-            m_Rotation = rectTransform.localRotation;
-        }
-
-        public void WriteToRect(in RectTransform rectTransform)
-        {
-            rectTransform.localPosition = m_LocalPosition;
-            rectTransform.anchoredPosition = m_AnchoredPosition;
-            rectTransform.sizeDelta = m_SizeDelta;
-            rectTransform.anchorMin = m_AnchorMin;
-            rectTransform.anchorMax = m_AnchorMax;
-            rectTransform.pivot = m_Pivot;
-            rectTransform.localScale = m_Scale;
-            rectTransform.localRotation = m_Rotation;
-        }
-    }
 }
+

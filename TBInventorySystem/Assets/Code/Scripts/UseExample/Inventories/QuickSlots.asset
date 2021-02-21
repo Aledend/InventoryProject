@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Rows: 1
   Cols: 9
-  SlotWidth: 30
+  SlotWidth: 50
   Padding: 5
   Headerheight: 10
   InventoryToggle: 0
@@ -26,27 +26,33 @@ MonoBehaviour:
   m_InventoryData: {fileID: 11400000, guid: 7bc1d29162fb4724d943f529ff06ff45, type: 2}
   Items:
   - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
+    Amount: 4
+  - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
+    Amount: 6
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
-    Amount: 0
+    Amount: 5
   - Data: {fileID: 0}
     Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
+  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
+    Amount: 16
   - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 0}
     Amount: 0
   Slots: []
-  OnShiftClickItemCallback:
+  OnMouseDownInventorySlot:
     m_PersistentCalls:
       m_Calls: []
-  OnCtrlClickItemCallback:
+  OnMouseUpInventorySlot:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMouseEnterInventorySlot:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMouseExitInventorySlot:
     m_PersistentCalls:
       m_Calls: []
