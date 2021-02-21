@@ -768,6 +768,10 @@ namespace InventorySystem
                 }
             }
 
+            if(UIObject)
+            {
+                UpdateUISprites();
+            }
         }
         private SlotInteraction[] GetArrangedSlotArray()
         {
