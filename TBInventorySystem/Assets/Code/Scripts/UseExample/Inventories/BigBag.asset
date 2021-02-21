@@ -26,149 +26,149 @@ MonoBehaviour:
   m_InventoryData: {fileID: 11400000, guid: 7bc1d29162fb4724d943f529ff06ff45, type: 2}
   Items:
   - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
-    Amount: 11
+    Amount: 4
+  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
+    Amount: 16
+  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
+    Amount: 16
+  - Data: {fileID: 11400000, guid: 23f40e7812301024c971f35b7f8559db, type: 2}
+    Amount: 16
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
+    Amount: 5
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 11400000, guid: 23f40e7812301024c971f35b7f8559db, type: 2}
+    Amount: 16
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
   - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
-    Amount: 16
-  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
-    Amount: 16
-  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
-    Amount: 16
-  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
-    Amount: 16
-  - Data: {fileID: 11400000, guid: 23f40e7812301024c971f35b7f8559db, type: 2}
-    Amount: 16
-  - Data: {fileID: 11400000, guid: 23f40e7812301024c971f35b7f8559db, type: 2}
-    Amount: 16
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
+    Amount: 11
   - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 0}
@@ -266,9 +266,15 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  OnShiftClickItemCallback:
+  OnMouseDownInventorySlot:
     m_PersistentCalls:
       m_Calls: []
-  OnCtrlClickItemCallback:
+  OnMouseUpInventorySlot:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMouseEnterInventorySlot:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMouseExitInventorySlot:
     m_PersistentCalls:
       m_Calls: []

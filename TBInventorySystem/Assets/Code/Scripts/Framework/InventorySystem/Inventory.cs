@@ -724,7 +724,7 @@ namespace InventorySystem
                 {
                     slots[i].RemoveSprite();
                 }
-                else if (Items[i].Amount == 0)
+                else if (Application.isPlaying && Items[i].Amount == 0)
                 {
                     slots[i].RemoveSprite();
                     Items[i].Data = null;

@@ -27,71 +27,27 @@ MonoBehaviour:
   Items:
   - Data: {fileID: 0}
     Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
+  - Data: {fileID: 11400000, guid: 475495f4a67164b459eb2ea57734ccd9, type: 2}
+    Amount: 9
+  - Data: {fileID: 11400000, guid: a14c6468304b2804fbfce43306f1011c, type: 2}
+    Amount: 1
   - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 11400000, guid: c1566e12f242757448594da5c359528f, type: 2}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
+    Amount: 1
   - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 11400000, guid: 475495f4a67164b459eb2ea57734ccd9, type: 2}
+    Amount: 8
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 0}
     Amount: 0
@@ -101,7 +57,51 @@ MonoBehaviour:
     Amount: 0
   - Data: {fileID: 0}
     Amount: 0
-  - Data: {fileID: 11400000, guid: 088edd15284fdcf4986cbada317623e6, type: 2}
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
+    Amount: 0
+  - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 0}
     Amount: 0
@@ -124,9 +124,15 @@ MonoBehaviour:
   - Data: {fileID: 0}
     Amount: 0
   Slots: []
-  OnShiftClickItemCallback:
+  OnMouseDownInventorySlot:
     m_PersistentCalls:
       m_Calls: []
-  OnCtrlClickItemCallback:
+  OnMouseUpInventorySlot:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMouseEnterInventorySlot:
+    m_PersistentCalls:
+      m_Calls: []
+  OnMouseExitInventorySlot:
     m_PersistentCalls:
       m_Calls: []
