@@ -19,3 +19,4 @@ MonoBehaviour:
   StackSize: 1
   ItemName: Legendary Cube
   Description: Out of this world!
+  Spawnable: 1

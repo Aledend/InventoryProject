@@ -42,15 +42,7 @@ namespace InventorySystem
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            
-            if(Input.GetKey(KeyCode.LeftControl))
-            {
-                //Amount popup
-            }
-            else if(Input.GetKey(KeyCode.LeftShift))
-            {
-                m_Inventory.ShiftClickItem(gameObject);
-            }
+            m_Inventory.OnMouseDownSlot(gameObject);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
@@ -67,6 +59,7 @@ namespace InventorySystem
                 c.sortingOrder = 2;
                 m_HoverTooltip.transform.SetParent(c.transform);
             }
+            m_Inventory.OnMouseEnterSlot(gameObject);
         }
 
         public void OnPointerExit(PointerEventData eventData)
@@ -79,11 +72,12 @@ namespace InventorySystem
                 Destroy(m_DescriptionParent.gameObject);
                 m_HoverTooltip.SetActive(false);
             }
+            m_Inventory.OnMouseExitSlot(gameObject);
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            //If held item put on this one  
+            m_Inventory.OnMouseUpSlot(gameObject);
         }
     }
 }

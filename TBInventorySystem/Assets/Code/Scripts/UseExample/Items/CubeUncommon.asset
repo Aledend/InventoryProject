@@ -19,3 +19,4 @@ MonoBehaviour:
   StackSize: 1
   ItemName: Uncommon cube
   Description: Seen plenty of these around.
+  Spawnable: 1

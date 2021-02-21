@@ -19,3 +19,4 @@ MonoBehaviour:
   StackSize: 1
   ItemName: Epic Cube
   Description: Wow! So purple and shiny!
+  Spawnable: 1

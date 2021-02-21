@@ -87,17 +87,36 @@ namespace InventorySystem
         public InventoryItem[] Items;
         public SlotInteraction[] Slots;
 
-        public UnityEvent<Inventory, InventoryItem> OnShiftClickItemCallback = new UnityEvent<Inventory, InventoryItem>();
-        public UnityEvent<Inventory, InventoryItem> OnCtrlClickItemCallback = new UnityEvent<Inventory, InventoryItem>();
+        public UnityEvent<Inventory, InventoryItem, int> OnMouseDownInventorySlot = 
+            new UnityEvent<Inventory, InventoryItem, int>();
+        public UnityEvent<Inventory, InventoryItem, int> OnMouseUpInventorySlot = 
+            new UnityEvent<Inventory, InventoryItem, int>();
+        public UnityEvent<Inventory, InventoryItem, int> OnMouseEnterInventorySlot =
+            new UnityEvent<Inventory, InventoryItem, int>();
+        public UnityEvent<Inventory, InventoryItem, int> OnMouseExitInventorySlot =
+            new UnityEvent<Inventory, InventoryItem, int>();
 
         // Handles showing and hiding of UI
-#region InputHandling
+        #region InputHandling
         // Toggling function applied to the given input listener in OnBeforeSceneLoadRuntimeMethod
         private void ToggleActive()
         {
+
+            
             if(UIObject)
             {
-                UIObject.SetActive(!UIObject.activeSelf);
+                if (UIObject.activeSelf)
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                    UIObject.SetActive(false);
+                }
+                else
+                {
+                    Cursor.lockState = CursorLockMode.None;
+                    Cursor.visible = true;
+                    UIObject.SetActive(true);
+                }
             }
         }
 
@@ -119,10 +138,7 @@ namespace InventorySystem
                 Items = new InventoryItem[Rows * Cols];
             }
 
-            if(Application.isPlaying)
-            {
-                UpdateUISprites();
-            }
+            UpdateUISprites();
         }
 
 #if UNITY_EDITOR
@@ -264,7 +280,9 @@ namespace InventorySystem
             Vector2 innerSize = CalculateInnerSize();
             Vector2 backgroundSize = CalculateObjectSize();
 
+
             background.GetComponent<RectTransform>().sizeDelta = backgroundSize;
+
             Image m_BackgroundImage = background.GetComponent<Image>();
 
             if (DrawHeader)
@@ -338,7 +356,6 @@ namespace InventorySystem
             }
             else if(UIParent != uiParent)
             {
-                Debug.Log("Destroying UIParent");
                 if (Application.isPlaying)
                     Destroy(sceneRef);
                 else
@@ -364,18 +381,6 @@ namespace InventorySystem
                 else
                     DestroyImmediate(inObject);
             }
-        }
-
-        public void OnBeforeAssemblyReload()
-        {
-            Debug.Log("Before Assembly Reload");
-            Debug.Log(UIObject);
-        }
-
-        public void OnAfterAssemblyReload()
-        {
-            Debug.Log("Did I lose references because of assembly reload?");
-            Debug.Log(UIObject);
         }
 
         public Rect CalculateInitialPosition(float padding, in RectTransform parent)
@@ -445,13 +450,26 @@ namespace InventorySystem
             sceneRef.ReturnObject.SetPersistentListenerState(0, UnityEngine.Events.UnityEventCallState.EditorAndRuntime);
 #endif
         }
-#endregion // Inventory UI
+        #endregion // Inventory UI
 
+        /// <summary>
+        /// Receives inventory item without decrementing amount.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public InventoryItem FetchItem(int Row, int Col)
         {
-            Assert.IsTrue(Row < Rows && Col < Cols,
-                string.Format("Array out of range. Row: {0}, Col: {1}", Row, Col));
-            return Items[Row * Cols + Col];
+            return FetchItem(Row * Cols + Col);
+        }
+
+        /// <summary>
+        /// Receives inventory item without decrementing amount.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public InventoryItem FetchItem(int index)
+        {
+            return Items[index];
         }
 
         public InventoryItem[] FetchInventory()
@@ -459,21 +477,78 @@ namespace InventorySystem
             return Items;
         }
 
-        public bool GetFirstEmptySlot(out int row, out int col)
+        /// <summary>
+        /// Takes inventoryitem and decrements amount.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public bool TakeItem(int index, out InventoryItem item)
         {
-            for(int i = 0; i < Items.Length; i++)
+            InventoryItem invItem = Items[index];
+
+            if (invItem.Data && invItem.Amount > 0)
             {
-                if(Items[i].Data == null)
-                {
-                    col = i % Cols;
-                    row = (i - col) / Rows;
-                    return true;
-                }
+                Items[index].RemoveAmount(1);
+                item = invItem;
+                UpdateUISprites();
+                return true;
             }
 
+            item = new InventoryItem();
+            return false;
+        }
+
+        public bool TakeAll(int index, out InventoryItem item)
+        {
+            InventoryItem invItem = Items[index];
+            if(invItem.Data && invItem.Amount > 0)
+            {
+                Items[index].Data = null;
+                Items[index].Amount = 0;
+                item = invItem;
+                UpdateUISprites();
+                return true;
+            }
+            item = new InventoryItem();
+            return false;
+        }
+
+        public bool GetFirstEmptySlot(out int row, out int col)
+        {
+            if(GetFirstEmptySlot(out int index))
+            {
+                col = index % Cols;
+                row = (index - col) / Rows;
+                return true;
+            }
             row = -1;
             col = -1;
             return false;
+        }
+
+        public bool GetFirstEmptySlot(out int index)
+        {
+            for (int i = 0; i < Items.Length; i++)
+            {
+                if (Items[i].Data == null)
+                {
+                    index = i;
+                    return true;
+                }
+            }
+            index = -1;
+            return false;
+        }
+
+        public void SwapItems(Inventory otherInventory, int otherIndex, InventoryItem otherItem,
+            InventoryItem thisItem, int thisIndex)
+        {
+            
+            otherInventory.TakeAll(otherIndex, out InventoryItem tempOther);
+            TakeAll(thisIndex, out InventoryItem tempThis);
+
+            otherInventory.AddItemToSlot(tempThis, otherIndex);
+            AddItemToSlot(tempOther, thisIndex);
         }
 
         public InventoryItem[] FetchInventoryGroup(Inventory[] inventories)
@@ -546,42 +621,69 @@ namespace InventorySystem
             }
         }
 
-        public void ShiftClickItem(GameObject itemSlot)
+        public void OnMouseDownSlot(GameObject itemSlot)
         {
-            InventoryItem item = Items[ItemSlotToIndex(itemSlot)];
-            OnShiftClickItemCallback.Invoke(this, item);
+            int index = ItemSlotToIndex(itemSlot);
+            InventoryItem item = Items[index];
+            OnMouseDownInventorySlot.Invoke(this, item, index);
         }
 
-        public void CtrlClickItem(GameObject itemSlot)
+        public void OnMouseUpSlot(GameObject itemSlot)
         {
-            InventoryItem item = Items[ItemSlotToIndex(itemSlot)];
-            OnCtrlClickItemCallback.Invoke(this, item);
+            int index = ItemSlotToIndex(itemSlot);
+            InventoryItem item = Items[index];
+            OnMouseUpInventorySlot.Invoke(this, item, index);
+        }
+
+        public void OnMouseEnterSlot(GameObject itemSlot)
+        {
+            int index = ItemSlotToIndex(itemSlot);
+            InventoryItem item = Items[index];
+            OnMouseEnterInventorySlot.Invoke(this, item, index);
+        }
+
+        public void OnMouseExitSlot(GameObject itemSlot)
+        {
+            int index = ItemSlotToIndex(itemSlot);
+            InventoryItem item = Items[index];
+            OnMouseExitInventorySlot.Invoke(this, item, index);
         }
 
         public bool AddItemToSlot(InventoryItem item, int row, int col)
         {
-            Assert.IsTrue(row < Rows && col < Cols, 
-                string.Format("Row or col index out of range", "Row: {0} ({1}), Col: {2} ({3})", row, Rows, col, Cols));
+            return AddItemToSlot(item, row * Cols + col);
+        }
 
-            InventoryItem slot = Items[row * Cols + col];
-            
+        public bool AddItemToSlot(InventoryItem item, int index)
+        {
+            Assert.IsTrue(index < Items.Length, "Index out of range when adding item to slot");
 
-            if(slot.Data != null)
+            if (Items[index].Data != null)
             {
                 return false;
             }
+            Items[index] = item;
 
-            Items[row * Cols + col] = item;
+            UpdateUISprites();
+
             return true;
+        }
+
+        public void ForceAddItem(InventoryItem item, int index)
+        {
+            Assert.IsTrue(index < Items.Length, "Index out of range when adding item to slot");
+
+            Items[index] = item;
+
+            UpdateUISprites();
         }
 
         public void UpdateUISprites(SlotInteraction[] slots = null)
         {
             slots ??= GetArrangedSlotArray();
-            
-            for(int i = 0; i < slots.Length; i++)
+
+            for (int i = 0; i < slots.Length; i++)
             {
-                
                 if (Items[i].Data == null)
                 {
                     slots[i].RemoveSprite();
@@ -598,6 +700,15 @@ namespace InventorySystem
             }
         }
 
+        public void RemoveItem(int index, SlotInteraction[] slots = null)
+        {
+            slots ??= GetArrangedSlotArray();
+            Items[index].Data = null;
+            Items[index].Amount = 0;
+            slots[index].RemoveSprite();
+            UpdateUISprites(slots);
+        }
+
         //Serialize content?
 
         //Resize bag?
@@ -607,6 +718,7 @@ namespace InventorySystem
             {
                 Array.Resize(ref Items, Cols * Rows);
             }
+
             //Clamp item amount between 0 and stacksize
             for(int i = 0; i < Items.Length; i++)
             {

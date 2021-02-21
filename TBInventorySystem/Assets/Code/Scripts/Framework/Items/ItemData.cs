@@ -11,4 +11,5 @@ public class ItemData : ScriptableObject
     public int StackSize = 1;
     public string ItemName = string.Empty;
     public string Description = string.Empty;
+    public bool Spawnable = false;
 }

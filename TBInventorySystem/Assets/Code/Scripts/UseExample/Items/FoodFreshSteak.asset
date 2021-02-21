@@ -19,3 +19,4 @@ MonoBehaviour:
   StackSize: 16
   ItemName: Fresh Steak
   Description: A fine piece.
+  Spawnable: 1

@@ -19,3 +19,4 @@ MonoBehaviour:
   StackSize: 16
   ItemName: Expired Fish
   Description: Probably shouldn't eat that.
+  Spawnable: 1

@@ -19,3 +19,4 @@ MonoBehaviour:
   StackSize: 16
   ItemName: Apple
   Description: Freshly picked.
+  Spawnable: 1
