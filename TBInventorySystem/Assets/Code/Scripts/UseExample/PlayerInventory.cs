@@ -54,7 +54,7 @@ public class PlayerInventory : MonoBehaviour
                 m_DraggedItemUI.transform.position = Input.mousePosition;
                 if (Input.GetMouseButtonUp(0))
                 {
-                    if(m_CurrentHoveringIndex != -1)
+                    if(m_CurrentHoveringIndex != -1 && m_CurrentHoveringInventory)
                     {
                         m_CurrentHoveringInventory.SwapItems(m_DragSource, m_DragSourceIndex, m_CurrentHoveringIndex);
 
@@ -62,6 +62,10 @@ public class PlayerInventory : MonoBehaviour
                     }
                     Destroy(m_DraggedItemUI.transform.parent.gameObject);
                     m_Dragging = false;
+                    m_CurrentHoveringIndex = -1;
+                    m_CurrentHoveringInventory = null;
+                    m_DragSourceIndex = -1;
+                    m_DragSource = null;
                 }
             }
         }

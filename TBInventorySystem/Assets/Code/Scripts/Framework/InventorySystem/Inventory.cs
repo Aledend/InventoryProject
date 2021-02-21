@@ -186,8 +186,8 @@ namespace InventorySystem
                 rectData = new RectTransformData(UIObject.GetComponent<RectTransform>());
             }
 
-            if (!parent && UIParent)
-                parent = UIParent.GetComponent<RectTransform>();
+            if (!parent && UIDragTarget)
+                parent = UIDragTarget.GetComponent<RectTransform>();
 
             DestroyUI();
             GenerateUI(parent, true, keepSizeAndPosition, rectData);   
@@ -268,14 +268,17 @@ namespace InventorySystem
             // UIParent
             if (!regenerating)
             {
-                SetUIParent(parent.GetComponent<RectTransform>());}
+                SetUIParent(parent.GetComponent<RectTransform>());
+            }
             if (inParentGroup)
             {
+                Debug.Log("setting parent");
                 // Drag target (Group Parent)
                 SetUIDragTarget(inParentGroup.GetComponent<RectTransform>());
             }
             else
             {
+                Debug.Log("setting self");
                 // Drag target (Self)
                 SetUIDragTarget(background.GetComponent<RectTransform>());
             }
@@ -369,6 +372,7 @@ namespace InventorySystem
             }
             else if (UIObject != uiObject)
             {
+                Debug.Log("destroying uiobject");
                 if (Application.isPlaying)
                     Destroy(uiObject);
                 else
@@ -386,6 +390,7 @@ namespace InventorySystem
             }
             else if (UIParent != uiParent)
             {
+                Debug.Log("destroying parent");
                 if (Application.isPlaying)
                     Destroy(uiParent);
                 else
@@ -414,6 +419,7 @@ namespace InventorySystem
             }
             else if (UIDragTarget != uiDragTarget)
             {
+                Debug.Log("destroying dragtarget");
                 if (Application.isPlaying)
                     Destroy(uiDragTarget);
                 else
