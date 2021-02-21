@@ -56,20 +56,6 @@ namespace InventorySystem
             }
         }
 
-        private void OnEnable()
-        {
-            #region Asserts
-            Assert.IsTrue(m_BackgroundPrefab.scene.name == null, "Inventory Background is not set.");
-            Assert.IsTrue(m_SlotPrefab.scene.name == null, "Inventory Slot is not set.");
-            Assert.IsTrue(m_CanvasPrefab.scene.name == null, "Inventory Canvas is not set.");
-            Assert.IsTrue(m_HeaderPrefab.scene.name == null, "Header is not set.");
-            Assert.IsTrue(m_InventoryGroupPrefab.scene.name == null, "Header is not set.");
-            Assert.IsNotNull(m_SlotHoverSprite, "Slot Sprite is not set.");
-            Assert.IsNotNull(m_SlotBackgroundSprite, "Slot Hover Sprite is not set.");
-            Assert.IsNotNull(m_SlotEmptySprite, "Slot Empty Sprite is not set.");
-            #endregion // Asserts
-        }
-
         #region Reference Handling
         /// <summary>
         /// Sent to generated canvas to keep reference to scene object alive.

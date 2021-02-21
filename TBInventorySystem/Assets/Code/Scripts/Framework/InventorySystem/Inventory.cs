@@ -186,7 +186,7 @@ namespace InventorySystem
                 rectData = new RectTransformData(UIObject.GetComponent<RectTransform>());
             }
 
-            if (!parent)
+            if (!parent && UIParent)
                 parent = UIParent.GetComponent<RectTransform>();
 
             DestroyUI();
