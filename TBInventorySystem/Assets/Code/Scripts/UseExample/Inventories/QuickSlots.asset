@@ -25,24 +25,24 @@ MonoBehaviour:
   UIObject: {fileID: 0}
   m_InventoryData: {fileID: 11400000, guid: 7bc1d29162fb4724d943f529ff06ff45, type: 2}
   Items:
-  - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
-    Amount: 4
-  - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
-    Amount: 6
+  - Data: {fileID: 11400000, guid: 475495f4a67164b459eb2ea57734ccd9, type: 2}
+    Amount: 9
   - Data: {fileID: 0}
     Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
-  - Data: {fileID: 11400000, guid: 2ec4a2038fa291747898fff312373cc0, type: 2}
-    Amount: 5
+  - Data: {fileID: 11400000, guid: c1566e12f242757448594da5c359528f, type: 2}
+    Amount: 1
+  - Data: {fileID: 11400000, guid: a14c6468304b2804fbfce43306f1011c, type: 2}
+    Amount: 1
   - Data: {fileID: 0}
     Amount: 0
   - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
-    Amount: 16
+    Amount: 3
+  - Data: {fileID: 11400000, guid: a14c6468304b2804fbfce43306f1011c, type: 2}
+    Amount: 1
   - Data: {fileID: 0}
     Amount: 0
-  - Data: {fileID: 0}
-    Amount: 0
+  - Data: {fileID: 11400000, guid: 51c54fa33a3ef7f4e8938a88e94cc03d, type: 2}
+    Amount: 6
   Slots: []
   OnMouseDownInventorySlot:
     m_PersistentCalls:

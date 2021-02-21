@@ -63,12 +63,20 @@ public class PlayerController : MonoBehaviour
     {
         if(m_HoldingItem && Input.GetMouseButtonDown(0))
         {
-            m_HeldItemRigidBody.detectCollisions = true;
-            m_HeldItemRigidBody.isKinematic = !m_HeldItemRigidBody.isKinematic;
-            GameObject.Instantiate(m_HeldItemPreview);
-            m_HeldItemRigidBody.isKinematic = !m_HeldItemRigidBody.isKinematic;
-            m_HeldItemRigidBody.detectCollisions = false;
-            m_PlayerInventory.QuickSlotInventory.TakeItem(m_HoldingIndex, out _);
+            if (m_PlayerInventory.QuickSlotInventory.TakeItem(m_HoldingIndex, out InventoryItem item))
+            {
+                m_HeldItemRigidBody.detectCollisions = true;
+                m_HeldItemRigidBody.isKinematic = !m_HeldItemRigidBody.isKinematic;
+                GameObject.Instantiate(m_HeldItemPreview);
+                m_HeldItemRigidBody.isKinematic = !m_HeldItemRigidBody.isKinematic;
+                m_HeldItemRigidBody.detectCollisions = false;
+                if(item.Amount <= 0)
+                {
+                    Destroy(m_HeldItemPreview);
+                    m_HoldingItem = false;
+                    m_HoldingIndex = -1;
+                }
+            }
         }
     }
 

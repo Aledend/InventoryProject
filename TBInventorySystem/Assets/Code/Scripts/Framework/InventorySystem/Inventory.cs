@@ -509,12 +509,10 @@ namespace InventorySystem
         /// <returns>If there is a valid item on the given index</returns>
         public bool TakeItem(int index, out InventoryItem item)
         {
-            InventoryItem invItem = Items[index];
-
-            if (invItem.Data && invItem.Amount > 0)
+            if (Items[index].Data && Items[index].Amount > 0)
             {
                 Items[index].RemoveAmount(1);
-                item = invItem;
+                item = Items[index];
                 UpdateUISprites();
                 return true;
             }
